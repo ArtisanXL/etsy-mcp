@@ -26,6 +26,8 @@ export interface OperationDescriptor {
   method: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   path: string;
   scopes: string[];
+  /** True when the Operation's security includes oauth2, i.e. it needs a Bearer token. */
+  oauth2: boolean;
   write: boolean;
   toolset: Toolset;
   params: ParamDescriptor[];

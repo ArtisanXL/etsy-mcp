@@ -80,13 +80,16 @@ export function createServer(config: Config, deps: ServerDeps = {}): McpServer {
           if (bearer) headers.Authorization = `Bearer ${bearer}`;
           return fetchImpl(url, { headers });
         };
-        const needsOAuth = op.scopes.length > 0;
+        const needsOAuth = op.oauth2;
         let res: Response;
         try {
           if (needsOAuth) {
             const token = await tokens.getAccessToken();
             res = await send(token);
-            if (res.status === 401) res = await send(await tokens.refreshAfterRejection(token));
+            if (res.status === 401) {
+              await res.body?.cancel();
+              res = await send(await tokens.refreshAfterRejection(token));
+            }
           } else {
             res = await send();
           }

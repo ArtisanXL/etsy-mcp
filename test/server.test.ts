@@ -56,7 +56,6 @@ describe("tools/call", () => {
     ["get_listing", { listing_id: 7 }, "/v3/application/listings/7"],
     ["get_listing", { listing_id: 7, language: "de" }, "/v3/application/listings/7?language=de"],
     ["find_shops", { shop_name: "x y", limit: 5 }, "/v3/application/shops?shop_name=x+y&limit=5"],
-    ["find_shops", { shop_name: "a", limit: 1, offset: 2 }, "/v3/application/shops?shop_name=a&limit=1&offset=2"],
   ];
 
   it.each(cases)("%s sends the expected request", async (name, args, pathAndQuery) => {

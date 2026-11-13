@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { mkdirSync, statSync, writeFileSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
@@ -12,7 +13,12 @@ const isToken = (r: RecordedRequest) => r.url.href === TOKEN_ENDPOINT;
 const tokenResponse = (access: string, refresh: string, expiresIn = 3600) =>
   new Response(JSON.stringify({ access_token: access, refresh_token: refresh, expires_in: expiresIn, token_type: "Bearer" }));
 
-function seedFile(dir: string, tokens: { access_token: string; refresh_token: string; expires_at: number }) {
+const sha = (v: string) => createHash("sha256").update(v).digest("hex");
+
+function seedFile(
+  dir: string,
+  tokens: { access_token: string; refresh_token: string; expires_at: number; seed_sha256?: string },
+) {
   mkdirSync(dir, { recursive: true });
   writeFileSync(join(dir, "tokens.json"), JSON.stringify(tokens));
 }
@@ -37,6 +43,15 @@ describe("Bearer on oauth2 Operations", () => {
     expect(call.url.pathname).toBe("/v3/application/shops/1/receipts");
     expect(call.headers.Authorization).toBe("Bearer a1");
     expect(call.headers["x-api-key"]).toBe("key:secret");
+  });
+
+  it("sends path parameters and pagination on an authenticated read", async () => {
+    const configDir = tempConfigDir();
+    seedFile(configDir, { access_token: "a", refresh_token: "r", expires_at: NOW + 3_600_000 });
+    const { client, requests } = await connect({ configDir }, undefined, { now });
+    await client.callTool({ name: "get_listings_by_shop", arguments: { shop_id: 3, limit: 1, offset: 2 } });
+    expect(requests[0].url.href).toBe("https://openapi.etsy.com/v3/application/shops/3/listings?limit=1&offset=2");
+    expect(requests[0].headers.Authorization).toBe("Bearer a");
   });
 
   it("uses a stored token that is still valid without refreshing", async () => {
@@ -196,6 +211,60 @@ describe("refresh", () => {
     expect(requests.at(-1)!.headers.Authorization).toBe("Bearer env-access");
   });
 
+  it("a stale ETSY_REFRESH_TOKEN does not overwrite a rotated token it already seeded", async () => {
+    const configDir = tempConfigDir();
+    seedFile(configDir, { access_token: "old", refresh_token: "r2", expires_at: 0, seed_sha256: sha("r1") });
+    const { client, requests } = await connect(
+      { configDir, refreshToken: "r1" },
+      (req) => (isToken(req) ? tokenResponse("a3", "r3") : new Response("{}")),
+      { now },
+    );
+    await client.callTool(RECEIPTS);
+    expect(new URLSearchParams(requests[0].body).get("refresh_token")).toBe("r2");
+    expect(await readFileTokens(configDir)).toMatchObject({ refresh_token: "r3", seed_sha256: sha("r1") });
+  });
+
+  it("records a hash (never the raw token) of the seed, and keeps it across rotations", async () => {
+    const configDir = tempConfigDir();
+    const respond = (req: RecordedRequest) =>
+      isToken(req) ? tokenResponse("a", `r-${requestsCount++}`, 0) : new Response("{}");
+    let requestsCount = 0;
+    const first = await connect({ configDir, refreshToken: "r1" }, respond, { now });
+    await first.client.callTool(RECEIPTS);
+    await first.client.callTool(RECEIPTS);
+    const file = await readFileTokens(configDir);
+    expect(file.seed_sha256).toBe(sha("r1"));
+    expect(JSON.stringify(file)).not.toContain('"r1"');
+
+    const second = await connect({ configDir, refreshToken: "r1" }, respond, { now });
+    await second.client.callTool(RECEIPTS);
+    expect(new URLSearchParams(second.requests[0].body).get("refresh_token")).toBe(file.refresh_token);
+  });
+
+  it("a new ETSY_REFRESH_TOKEN value re-seeds an already-seeded file", async () => {
+    const configDir = tempConfigDir();
+    seedFile(configDir, { access_token: "x", refresh_token: "r2", expires_at: NOW + 3_600_000, seed_sha256: sha("r1") });
+    const { client, requests } = await connect(
+      { configDir, refreshToken: "r-new" },
+      (req) => (isToken(req) ? tokenResponse("a", "b") : new Response("{}")),
+      { now },
+    );
+    await client.callTool(RECEIPTS);
+    expect(new URLSearchParams(requests[0].body).get("refresh_token")).toBe("r-new");
+  });
+
+  it("a file whose refresh token equals the env value is remembered as seeded across a rotation", async () => {
+    const configDir = tempConfigDir();
+    seedFile(configDir, { access_token: "x", refresh_token: "r1", expires_at: 0 });
+    const { client } = await connect(
+      { configDir, refreshToken: "r1" },
+      (req) => (isToken(req) ? tokenResponse("a", "r2") : new Response("{}")),
+      { now },
+    );
+    await client.callTool(RECEIPTS);
+    expect(await readFileTokens(configDir)).toMatchObject({ refresh_token: "r2", seed_sha256: sha("r1") });
+  });
+
   it("ETSY_REFRESH_TOKEN equal to the file's refresh token keeps the stored access token", async () => {
     const configDir = tempConfigDir();
     seedFile(configDir, { access_token: "file-access", refresh_token: "r1", expires_at: NOW + 3_600_000 });
@@ -213,6 +282,29 @@ describe("auth errors", () => {
     expect(res.isError).toBe(true);
     expect(JSON.stringify(res.content)).toMatch(/Run `npx @artisanxl\/etsy-mcp login`/);
     expect(requests).toHaveLength(0);
+  });
+
+  it.each(["{not json", "null", '{"access_token":"a"}'])("reports a malformed token file (%s) with a login hint", async (raw) => {
+    const configDir = tempConfigDir();
+    writeFileSync(join(configDir, "tokens.json"), raw);
+    const { client, requests } = await connect({ configDir }, undefined, { now });
+    const res = await client.callTool(RECEIPTS);
+    expect(res.isError).toBe(true);
+    expect(JSON.stringify(res.content)).toMatch(/malformed.*login/);
+    expect(requests).toHaveLength(0);
+  });
+
+  it("does not echo an invalid refresh response (it may contain tokens)", async () => {
+    const { client } = await connect(
+      { refreshToken: "r1" },
+      (req) => (isToken(req) ? new Response('{"access_token":"SECRET-ACCESS","expires_in":"soon"}') : new Response("{}")),
+      { now },
+    );
+    const res = await client.callTool(RECEIPTS);
+    expect(res.isError).toBe(true);
+    const text = JSON.stringify(res.content);
+    expect(text).toContain("expires_in");
+    expect(text).not.toContain("SECRET-ACCESS");
   });
 
   it("surfaces a failed refresh with a login hint", async () => {
