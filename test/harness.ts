@@ -11,6 +11,8 @@ export interface RecordedRequest {
   url: URL;
   headers: Record<string, string>;
   body?: string;
+  /** Set instead of `body` for multipart requests. */
+  form?: FormData;
 }
 
 export const TOKEN_ENDPOINT = "https://openapi.etsy.com/v3/public/oauth/token";
@@ -31,7 +33,13 @@ export async function connect(
     {
       ...deps,
       fetch: async (url, init) => {
-        const req = { method: init.method ?? "GET", url, headers: init.headers, body: init.body };
+        const req = {
+          method: init.method ?? "GET",
+          url,
+          headers: init.headers,
+          body: typeof init.body === "string" ? init.body : undefined,
+          form: init.body instanceof FormData ? init.body : undefined,
+        };
         requests.push(req);
         return respond(req);
       },

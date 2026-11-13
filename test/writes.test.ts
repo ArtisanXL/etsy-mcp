@@ -40,14 +40,14 @@ describe("Read-only Mode", () => {
 });
 
 describe("ETSY_ALLOW_WRITES=true", () => {
-  it("offers Write Tools, except multipart Operations until uploads land", async () => {
+  it("offers every Write Tool, including the multipart uploads", async () => {
     const names = await listNames(await writing());
     for (const n of ["create_draft_listing", "update_listing", "delete_listing", "update_listing_inventory", "token_scopes"]) {
       expect(names).toContain(n);
     }
-    expect(names).toHaveLength(operations.length - 3);
+    expect(names).toHaveLength(operations.length);
     for (const n of ["upload_listing_image", "upload_listing_file", "upload_listing_video"]) {
-      expect(names).not.toContain(n);
+      expect(names).toContain(n);
     }
   });
 
