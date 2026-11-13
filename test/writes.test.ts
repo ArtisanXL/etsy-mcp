@@ -151,6 +151,75 @@ describe("JSON bodies", () => {
   });
 });
 
+describe("empty arrays and null in bodies", () => {
+  it("update_listing accepts an empty array to clear tags, sent as an empty form value", async () => {
+    const { client, requests } = await writing();
+    const res = await client.callTool({ name: "update_listing", arguments: { shop_id: 1, listing_id: 2, tags: [] } });
+    expect(res.isError).toBeFalsy();
+    expect(requests[0].body).toBe("tags=");
+  });
+
+  it("update_listing_inventory accepts empty nested arrays and sends them as JSON", async () => {
+    const { client, requests } = await writing();
+    const products = [
+      { sku: "S", property_values: [], offerings: [{ price: 1, quantity: 1, is_enabled: true, readiness_state_id: 1 }] },
+    ];
+    const res = await client.callTool({
+      name: "update_listing_inventory",
+      arguments: { listing_id: 1, products, price_on_property: [] },
+    });
+    expect(res.isError).toBeFalsy();
+    expect(JSON.parse(requests[0].body!)).toEqual({ products, price_on_property: [] });
+  });
+
+  it("still rejects an empty array for a query parameter", async () => {
+    const { client, requests } = await connect();
+    const res = await client.callTool({ name: "get_listings_by_listing_ids", arguments: { listing_ids: [] } });
+    expect(res.isError).toBe(true);
+    expect(requests).toHaveLength(0);
+  });
+
+  it("sends explicit nulls in nested JSON bodies as-is", async () => {
+    const { client, requests } = await writing();
+    const products = [
+      {
+        sku: null,
+        property_values: [{ property_id: 1, value_ids: [2], scale_id: null, values: ["x"] }],
+        offerings: [{ price: 1, quantity: 1, is_enabled: true, readiness_state_id: null }],
+      },
+    ];
+    const res = await client.callTool({ name: "update_listing_inventory", arguments: { listing_id: 1, products } });
+    expect(res.isError).toBeFalsy();
+    expect(JSON.parse(requests[0].body!)).toEqual({ products });
+  });
+
+  it("sends a top-level null in a JSON body", async () => {
+    const { client, requests } = await writing();
+    await client.callTool({
+      name: "create_receipt_shipment",
+      arguments: { shop_id: 1, receipt_id: 2, mail_class: null, tracking_code: "T" },
+    });
+    expect(JSON.parse(requests[0].body!)).toEqual({ mail_class: null, tracking_code: "T" });
+  });
+
+  it("omits null from form bodies", async () => {
+    const { client, requests } = await writing();
+    const res = await client.callTool({
+      name: "update_listing",
+      arguments: { shop_id: 1, listing_id: 2, title: "t", shipping_profile_id: null },
+    });
+    expect(res.isError).toBeFalsy();
+    expect(requests[0].body).toBe("title=t");
+  });
+
+  it("omits null from query strings", async () => {
+    const { client, requests } = await writing();
+    const res = await client.callTool({ name: "get_shop_receipts", arguments: { shop_id: 1, was_paid: null, limit: 5 } });
+    expect(res.isError).toBeFalsy();
+    expect(requests[0].url.search).toBe("?limit=5");
+  });
+});
+
 describe("DELETE and auth", () => {
   it("sends DELETE without a body or Content-Type", async () => {
     const { client, requests } = await writing(() => new Response(null, { status: 204 }));
@@ -228,7 +297,7 @@ describe("flat input schema", () => {
     expect(schema.required).toEqual(
       expect.arrayContaining(["shop_id", "quantity", "title", "description", "price", "who_made", "when_made", "taxonomy_id"]),
     );
-    expect(schema.properties.tags).toMatchObject({ type: "array", items: { type: "string" } });
+    expect(JSON.stringify(schema.properties.tags)).toContain('"items":{"type":"string"}');
     expect(schema.properties.taxonomy_id.type).toBe("integer");
   });
 

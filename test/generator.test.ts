@@ -112,6 +112,17 @@ describe("schema fidelity", () => {
     ).toEqual({ type: "string", enum: ["A", "B"] });
   });
 
+  it("keeps the nullable flag on parameters, array items and object properties", () => {
+    expect(param({ name: "x", in: "query", schema: { type: "boolean", nullable: true } }).nullable).toBe(true);
+    expect(param({ name: "x", in: "query", schema: { type: "boolean" } }).nullable).toBeUndefined();
+    const p = param({
+      name: "o",
+      in: "query",
+      schema: { type: "array", items: { type: "object", properties: { a: { type: "string", nullable: true } } } },
+    });
+    expect(p.items?.properties).toEqual([{ name: "a", required: false, type: "string", nullable: true }]);
+  });
+
   it("treats nullable parameters as not required", () => {
     expect(
       param({ name: "x", in: "query", required: true, schema: { type: "boolean", nullable: true } }).required,
@@ -150,7 +161,7 @@ describe("request bodies", () => {
     expect(op.params).toEqual([
       { name: "id", in: "path", required: true, type: "integer" },
       { name: "title", in: "body-form", required: true, type: "string", description: "T" },
-      { name: "gone", in: "body-form", required: false, type: "integer" },
+      { name: "gone", in: "body-form", required: false, type: "integer", nullable: true },
       { name: "tags", in: "body-form", required: false, type: "array", items: { type: "string" } },
     ]);
   });

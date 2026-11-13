@@ -4,7 +4,7 @@ import { z } from "zod";
 import type { Config } from "./config.js";
 import { LOGIN_COMMAND, TokenError, TokenStore } from "./token-store.js";
 import { operations } from "./generated/operations.js";
-import type { OperationDescriptor, PropertyDescriptor, ValueSchema } from "./operation.js";
+import type { OperationDescriptor, ParamDescriptor, PropertyDescriptor, ValueSchema } from "./operation.js";
 
 export interface FetchInit {
   method?: OperationDescriptor["method"];
@@ -21,8 +21,13 @@ export interface ServerDeps {
 const API_BASE = "https://openapi.etsy.com";
 
 export function valueSchema(v: ValueSchema): z.ZodType {
+  const s = baseSchema(v);
+  return v.nullable ? s.nullable() : s;
+}
+
+function baseSchema(v: ValueSchema): z.ZodType {
   if (v.type === "array") {
-    return z.array(v.items ? valueSchema(v.items) : z.string()).min(1);
+    return z.array(v.items ? valueSchema(v.items) : z.string());
   }
   if (v.enum && (v.type === "integer" || v.type === "number")) {
     const literals = v.enum.map((e) => z.literal(e));
@@ -42,8 +47,10 @@ export function valueSchema(v: ValueSchema): z.ZodType {
   return z.string();
 }
 
-function propertySchema(p: PropertyDescriptor): z.ZodType {
-  let s = valueSchema(p);
+function propertySchema(p: PropertyDescriptor, nonEmptyArray = false): z.ZodType {
+  // An empty array in a query string would send nothing; body fields may legitimately clear a list.
+  let s = nonEmptyArray && p.type === "array" ? (baseSchema(p) as z.ZodArray).min(1) : baseSchema(p);
+  if (p.nullable) s = s.nullable();
   if (p.description) s = s.describe(p.description);
   return p.required ? s : s.optional();
 }
@@ -52,7 +59,11 @@ function propertyShape(props: PropertyDescriptor[]): Record<string, z.ZodType> {
   return Object.fromEntries(props.map((p) => [p.name, propertySchema(p)]));
 }
 
-export function toolAnnotations(op: OperationDescriptor): ToolAnnotations {
+function paramShape(params: ParamDescriptor[]): Record<string, z.ZodType> {
+  return Object.fromEntries(params.map((p) => [p.name, propertySchema(p, p.in === "query")]));
+}
+
+function toolAnnotations(op: OperationDescriptor): ToolAnnotations {
   if (!op.write) return { readOnlyHint: true, openWorldHint: true };
   return {
     readOnlyHint: false,
@@ -72,6 +83,10 @@ function buildRequest(op: OperationDescriptor, args: Record<string, unknown>) {
   for (const p of op.params) {
     const v = args[p.name];
     if (v === undefined) continue;
+    if (v === null) {
+      if (p.in === "body-json") json[p.name] = null;
+      continue;
+    }
     if (p.in === "path") path = path.replace(`{${p.name}}`, encodeURIComponent(String(v)));
     else if (p.in === "query") url.searchParams.set(p.name, formValue(v));
     else if (p.in === "body-form") form.set(p.name, formValue(v));
@@ -112,7 +127,7 @@ export function createServer(config: Config, deps: ServerDeps = {}): McpServer {
   for (const op of offered) {
     server.registerTool(
       op.toolName,
-      { description: op.description, inputSchema: propertyShape(op.params), annotations: toolAnnotations(op) },
+      { description: op.description, inputSchema: paramShape(op.params), annotations: toolAnnotations(op) },
       async (args: Record<string, unknown>) => {
         const { url, contentType, body: requestBody } = buildRequest(op, args);
         const send = (bearer?: string) => {

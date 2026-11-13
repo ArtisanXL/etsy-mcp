@@ -10,6 +10,8 @@ export interface ValueSchema {
   maximum?: number;
   enum?: (string | number)[];
   items?: ValueSchema;
+  /** The spec allows an explicit null; null is sent in JSON bodies and omitted from query/form. */
+  nullable?: true;
   /** Fields of a nested JSON object. */
   properties?: PropertyDescriptor[];
 }

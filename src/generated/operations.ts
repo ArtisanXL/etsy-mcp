@@ -144,6 +144,7 @@ export const operations: OperationDescriptor[] = [
         "required": false,
         "type": "integer",
         "description": "The numeric ID of the [shipping profile](/documentation/reference#operation/getShopShippingProfile) associated with the listing. Required when listing type is `physical`.",
+        "nullable": true,
         "minimum": 1
       },
       {
@@ -152,6 +153,7 @@ export const operations: OperationDescriptor[] = [
         "required": false,
         "type": "integer",
         "description": "The numeric ID of the [Return Policy](/documentation/reference#operation/getShopReturnPolicies).",
+        "nullable": true,
         "minimum": 1
       },
       {
@@ -160,6 +162,7 @@ export const operations: OperationDescriptor[] = [
         "required": false,
         "type": "array",
         "description": "A list of material strings for materials used in the product. Valid materials strings contain only letters, numbers, and whitespace characters. (regex: /[^\\p{L}\\p{Nd}\\p{Zs}]/u) Default value is null.",
+        "nullable": true,
         "items": {
           "type": "string"
         }
@@ -170,6 +173,7 @@ export const operations: OperationDescriptor[] = [
         "required": false,
         "type": "integer",
         "description": "The numeric ID of the [shop section](/documentation/reference#tag/Shop-Section) for this listing. Default value is null.",
+        "nullable": true,
         "minimum": 1
       },
       {
@@ -177,14 +181,16 @@ export const operations: OperationDescriptor[] = [
         "in": "body-form",
         "required": false,
         "type": "integer",
-        "description": "The minimum number of days required to process this listing. Default value is null."
+        "description": "The minimum number of days required to process this listing. Default value is null.",
+        "nullable": true
       },
       {
         "name": "processing_max",
         "in": "body-form",
         "required": false,
         "type": "integer",
-        "description": "The maximum number of days required to process this listing. Default value is null."
+        "description": "The maximum number of days required to process this listing. Default value is null.",
+        "nullable": true
       },
       {
         "name": "readiness_state_id",
@@ -192,6 +198,7 @@ export const operations: OperationDescriptor[] = [
         "required": false,
         "type": "integer",
         "description": "The numeric ID of the [processing profile](/documentation/reference#operation/getShopReadinessStateDefinition) associated with the listing. Returned only when the listing is `active` and of type `physical`, and the endpoint is either shop-scoped (path contains `shop_id`) or a single-listing request such as `getListing`. For every other case this field can be null.",
+        "nullable": true,
         "minimum": 1
       },
       {
@@ -200,6 +207,7 @@ export const operations: OperationDescriptor[] = [
         "required": false,
         "type": "array",
         "description": "A comma-separated list of tag strings for the listing. When creating or updating a listing, valid tag strings contain only letters, numbers, whitespace characters, -, ', ™, ©, and ®. (regex: /[^\\p{L}\\p{Nd}\\p{Zs}\\-'™©®]/u) Default value is null.",
+        "nullable": true,
         "items": {
           "type": "string"
         }
@@ -210,6 +218,7 @@ export const operations: OperationDescriptor[] = [
         "required": false,
         "type": "array",
         "description": "An array of style strings for this listing, each of which is free-form text string such as \"Formal\", or \"Steampunk\". When creating or updating a listing, the listing may have up to two styles. Valid style strings contain only letters, numbers, and whitespace characters. (regex: /[^\\p{L}\\p{Nd}\\p{Zs}]/u) Each style string is limited to 45 characters. Default value is null.",
+        "nullable": true,
         "items": {
           "type": "string"
         }
@@ -220,6 +229,7 @@ export const operations: OperationDescriptor[] = [
         "required": false,
         "type": "number",
         "description": "The numeric weight of the product measured in units set in 'item_weight_unit'. Default value is null. If set, the value must be greater than 0.",
+        "nullable": true,
         "minimum": 0,
         "maximum": 1.79769313486e+308
       },
@@ -229,6 +239,7 @@ export const operations: OperationDescriptor[] = [
         "required": false,
         "type": "number",
         "description": "The numeric length of the product measured in units set in 'item_dimensions_unit'. Default value is null. If set, the value must be greater than 0.",
+        "nullable": true,
         "minimum": 0,
         "maximum": 1.79769313486e+308
       },
@@ -238,6 +249,7 @@ export const operations: OperationDescriptor[] = [
         "required": false,
         "type": "number",
         "description": "The numeric width of the product measured in units set in 'item_dimensions_unit'. Default value is null. If set, the value must be greater than 0.",
+        "nullable": true,
         "minimum": 0,
         "maximum": 1.79769313486e+308
       },
@@ -247,6 +259,7 @@ export const operations: OperationDescriptor[] = [
         "required": false,
         "type": "number",
         "description": "The numeric height of the product measured in units set in 'item_dimensions_unit'. Default value is null. If set, the value must be greater than 0.",
+        "nullable": true,
         "minimum": 0,
         "maximum": 1.79769313486e+308
       },
@@ -256,6 +269,7 @@ export const operations: OperationDescriptor[] = [
         "required": false,
         "type": "string",
         "description": "A string defining the units used to measure the weight of the product. Default value is null.",
+        "nullable": true,
         "enum": [
           "oz",
           "lb",
@@ -269,6 +283,7 @@ export const operations: OperationDescriptor[] = [
         "required": false,
         "type": "string",
         "description": "A string defining the units used to measure the dimensions of the product. Default value is null.",
+        "nullable": true,
         "enum": [
           "in",
           "ft",
@@ -285,6 +300,7 @@ export const operations: OperationDescriptor[] = [
         "required": false,
         "type": "array",
         "description": "An array of unique IDs of production partner ids.",
+        "nullable": true,
         "items": {
           "type": "integer",
           "minimum": 1
@@ -296,6 +312,7 @@ export const operations: OperationDescriptor[] = [
         "required": false,
         "type": "array",
         "description": "An array of numeric image IDs of the images in a listing, which can include up to 20 images.",
+        "nullable": true,
         "items": {
           "type": "integer",
           "minimum": 1
@@ -306,49 +323,56 @@ export const operations: OperationDescriptor[] = [
         "in": "body-form",
         "required": false,
         "type": "string",
-        "description": "The brand or trademark name for the EU commercial guarantee (required under GPSR/ECGT for eligible EU traders). Maximum 25 characters. See the [Etsy Seller Handbook](https://help.etsy.com/hc/articles/43191692248343) for details. If any one of ecgt_garan_brand, ecgt_garan_model, ecgt_garan_years, or ecgt_garan_guarantee_details is provided and non-empty, all four are required. Silently ignored for digital listings and for sellers who are not eligible EU traders."
+        "description": "The brand or trademark name for the EU commercial guarantee (required under GPSR/ECGT for eligible EU traders). Maximum 25 characters. See the [Etsy Seller Handbook](https://help.etsy.com/hc/articles/43191692248343) for details. If any one of ecgt_garan_brand, ecgt_garan_model, ecgt_garan_years, or ecgt_garan_guarantee_details is provided and non-empty, all four are required. Silently ignored for digital listings and for sellers who are not eligible EU traders.",
+        "nullable": true
       },
       {
         "name": "ecgt_garan_years",
         "in": "body-form",
         "required": false,
         "type": "integer",
-        "description": "Duration of the EU commercial guarantee in whole years (minimum 3, maximum 99). Required together with ecgt_garan_brand, ecgt_garan_model, and ecgt_garan_guarantee_details. Silently ignored for digital listings and for sellers who are not eligible EU traders."
+        "description": "Duration of the EU commercial guarantee in whole years (minimum 3, maximum 99). Required together with ecgt_garan_brand, ecgt_garan_model, and ecgt_garan_guarantee_details. Silently ignored for digital listings and for sellers who are not eligible EU traders.",
+        "nullable": true
       },
       {
         "name": "ecgt_garan_model",
         "in": "body-form",
         "required": false,
         "type": "string",
-        "description": "The product model or reference number for the EU commercial guarantee label. Maximum 20 characters. Required together with ecgt_garan_brand, ecgt_garan_years, and ecgt_garan_guarantee_details. Silently ignored for digital listings and for sellers who are not eligible EU traders."
+        "description": "The product model or reference number for the EU commercial guarantee label. Maximum 20 characters. Required together with ecgt_garan_brand, ecgt_garan_years, and ecgt_garan_guarantee_details. Silently ignored for digital listings and for sellers who are not eligible EU traders.",
+        "nullable": true
       },
       {
         "name": "ecgt_garan_guarantee_details",
         "in": "body-form",
         "required": false,
         "type": "string",
-        "description": "Free-text description of the EU commercial guarantee terms and coverage. Maximum 255 characters. Required together with ecgt_garan_brand, ecgt_garan_model, and ecgt_garan_years. Silently ignored for digital listings and for sellers who are not eligible EU traders."
+        "description": "Free-text description of the EU commercial guarantee terms and coverage. Maximum 255 characters. Required together with ecgt_garan_brand, ecgt_garan_model, and ecgt_garan_years. Silently ignored for digital listings and for sellers who are not eligible EU traders.",
+        "nullable": true
       },
       {
         "name": "ecgt_other_commercial_guarantee_details",
         "in": "body-form",
         "required": false,
         "type": "string",
-        "description": "Free-text details of any additional commercial guarantee or warranty beyond the primary EU commercial guarantee. Maximum 255 characters. Silently ignored for digital listings and for sellers who are not eligible EU traders."
+        "description": "Free-text details of any additional commercial guarantee or warranty beyond the primary EU commercial guarantee. Maximum 255 characters. Silently ignored for digital listings and for sellers who are not eligible EU traders.",
+        "nullable": true
       },
       {
         "name": "ecgt_after_sales_service_info",
         "in": "body-form",
         "required": false,
         "type": "string",
-        "description": "After-sales service, repairability, or eco-friendly delivery information required under EU GPSR/ECGT regulations. Maximum 255 characters. Silently ignored for digital listings and for sellers who are not eligible EU traders."
+        "description": "After-sales service, repairability, or eco-friendly delivery information required under EU GPSR/ECGT regulations. Maximum 255 characters. Silently ignored for digital listings and for sellers who are not eligible EU traders.",
+        "nullable": true
       },
       {
         "name": "ecgt_software_update_details",
         "in": "body-form",
         "required": false,
         "type": "string",
-        "description": "Details of software update availability and the duration of such updates, as required under EU ECGT regulations for digital content. Maximum 255 characters. Silently ignored for physical listings and for sellers who are not eligible EU traders."
+        "description": "Details of software update availability and the duration of such updates, as required under EU ECGT regulations for digital content. Maximum 255 characters. Silently ignored for physical listings and for sellers who are not eligible EU traders.",
+        "nullable": true
       },
       {
         "name": "gpsr_manufacturer_type",
@@ -356,6 +380,7 @@ export const operations: OperationDescriptor[] = [
         "required": false,
         "type": "string",
         "description": "Who the manufacturer of this product is, for GPSR (EU General Product Safety Regulation) purposes. Either `seller` (your shop is the manufacturer) or `economic_operator` (a manufacturer record from the [Shop Economic Operators](/documentation/reference#tag/Shop-Economic-Operators) endpoints, identified by `gpsr_manufacturer_id`). `seller` is rejected when `who_made` is `someone_else`; use `economic_operator` for items made by a third party. Send `null` to clear. Optional for now; it becomes required for listings from eligible traders that sell into the EU 60 days after these fields were announced. See the [GPSR Economic Operators Tutorial](/documentation/tutorials/gpsr-economic-operators) for eligibility and the full flow.",
+        "nullable": true,
         "enum": [
           "seller",
           "economic_operator"
@@ -366,7 +391,8 @@ export const operations: OperationDescriptor[] = [
         "in": "body-form",
         "required": false,
         "type": "integer",
-        "description": "The `economic_operator_id` of the manufacturer, from the [Shop Economic Operators](/documentation/reference#tag/Shop-Economic-Operators) endpoints. Required when `gpsr_manufacturer_type` is `economic_operator`, and rejected when the type is anything else. The operator must belong to this shop and not be deleted. The manufacturer may be located anywhere in the world. If you change `gpsr_manufacturer_type` to `seller` without sending this field, the stored id is cleared for you."
+        "description": "The `economic_operator_id` of the manufacturer, from the [Shop Economic Operators](/documentation/reference#tag/Shop-Economic-Operators) endpoints. Required when `gpsr_manufacturer_type` is `economic_operator`, and rejected when the type is anything else. The operator must belong to this shop and not be deleted. The manufacturer may be located anywhere in the world. If you change `gpsr_manufacturer_type` to `seller` without sending this field, the stored id is cleared for you.",
+        "nullable": true
       },
       {
         "name": "gpsr_responsible_person_type",
@@ -374,6 +400,7 @@ export const operations: OperationDescriptor[] = [
         "required": false,
         "type": "string",
         "description": "Who the EU responsible person for this product is, for GPSR purposes. Either `seller` (your shop; only valid when the shop's legal address, or the address on file, is in the European Union) or `economic_operator` (a record from the [Shop Economic Operators](/documentation/reference#tag/Shop-Economic-Operators) endpoints, identified by `gpsr_responsible_person_id`, which must have an address in the European Union). Send `null` to clear. Optional for now; it becomes required for listings from eligible traders that sell into the EU 60 days after these fields were announced. See the [GPSR Economic Operators Tutorial](/documentation/tutorials/gpsr-economic-operators) for eligibility and the full flow.",
+        "nullable": true,
         "enum": [
           "seller",
           "economic_operator"
@@ -384,21 +411,24 @@ export const operations: OperationDescriptor[] = [
         "in": "body-form",
         "required": false,
         "type": "integer",
-        "description": "The `economic_operator_id` of the EU responsible person, from the [Shop Economic Operators](/documentation/reference#tag/Shop-Economic-Operators) endpoints. Required when `gpsr_responsible_person_type` is `economic_operator`, and rejected when the type is anything else. The operator must belong to this shop and not be deleted, and its address must be in the European Union. If you change `gpsr_responsible_person_type` to `seller` without sending this field, the stored id is cleared for you."
+        "description": "The `economic_operator_id` of the EU responsible person, from the [Shop Economic Operators](/documentation/reference#tag/Shop-Economic-Operators) endpoints. Required when `gpsr_responsible_person_type` is `economic_operator`, and rejected when the type is anything else. The operator must belong to this shop and not be deleted, and its address must be in the European Union. If you change `gpsr_responsible_person_type` to `seller` without sending this field, the stored id is cleared for you.",
+        "nullable": true
       },
       {
         "name": "gpsr_serial_number",
         "in": "body-form",
         "required": false,
         "type": "string",
-        "description": "An optional serial number, batch number, or lot identifier that lets the product be traced for GPSR purposes. Maximum 255 characters. Send `null` to clear."
+        "description": "An optional serial number, batch number, or lot identifier that lets the product be traced for GPSR purposes. Maximum 255 characters. Send `null` to clear.",
+        "nullable": true
       },
       {
         "name": "gpsr_safety_warnings",
         "in": "body-form",
         "required": false,
         "type": "string",
-        "description": "Optional free-text safety warnings and safety information for the product regarding GPSR purposes, shown to buyers as product safety information on the listing page (for example age restrictions, choking hazards, or care and handling instructions). Maximum 102,400 characters. Send `null` to clear."
+        "description": "Optional free-text safety warnings and safety information for the product regarding GPSR purposes, shown to buyers as product safety information on the listing page (for example age restrictions, choking hazards, or care and handling instructions). Maximum 102,400 characters. Send `null` to clear.",
+        "nullable": true
       },
       {
         "name": "is_supply",
@@ -573,91 +603,104 @@ export const operations: OperationDescriptor[] = [
         "in": "body-json",
         "required": false,
         "type": "string",
-        "description": "The service level of postal or carrier service selected for the shipment (e.g., First-Class, Priority, Ground, Express)."
+        "description": "The service level of postal or carrier service selected for the shipment (e.g., First-Class, Priority, Ground, Express).",
+        "nullable": true
       },
       {
         "name": "weight",
         "in": "body-json",
         "required": false,
         "type": "number",
-        "description": "The total weight of the package."
+        "description": "The total weight of the package.",
+        "nullable": true
       },
       {
         "name": "weight_units",
         "in": "body-json",
         "required": false,
         "type": "string",
-        "description": "Unit of measurement used for package weight (oz, grams, etc.)."
+        "description": "Unit of measurement used for package weight (oz, grams, etc.).",
+        "nullable": true
       },
       {
         "name": "length",
         "in": "body-json",
         "required": false,
         "type": "number",
-        "description": "Longest side of the package."
+        "description": "Longest side of the package.",
+        "nullable": true
       },
       {
         "name": "width",
         "in": "body-json",
         "required": false,
         "type": "number",
-        "description": "Second longest side of the package."
+        "description": "Second longest side of the package.",
+        "nullable": true
       },
       {
         "name": "height",
         "in": "body-json",
         "required": false,
         "type": "number",
-        "description": "Third longest side of the package."
+        "description": "Third longest side of the package.",
+        "nullable": true
       },
       {
         "name": "dimension_units",
         "in": "body-json",
         "required": false,
         "type": "string",
-        "description": "Unit of measurement used for package dimensions (in, cm...)."
+        "description": "Unit of measurement used for package dimensions (in, cm...).",
+        "nullable": true
       },
       {
         "name": "shipping_label_cost",
         "in": "body-json",
         "required": false,
         "type": "number",
-        "description": "The purchase price the seller paid for the shipping label."
+        "description": "The purchase price the seller paid for the shipping label.",
+        "nullable": true
       },
       {
         "name": "shipping_label_currency",
         "in": "body-json",
         "required": false,
         "type": "string",
-        "description": "The currency in which the shipping label was purchased."
+        "description": "The currency in which the shipping label was purchased.",
+        "nullable": true
       },
       {
         "name": "revenue_eligibility",
         "in": "body-json",
         "required": false,
         "type": "string",
-        "description": "A flag indicating if the shipment is tied to a revenue share agreement between Etsy and the vendor."
+        "description": "A flag indicating if the shipment is tied to a revenue share agreement between Etsy and the vendor.",
+        "nullable": true
       },
       {
         "name": "ship_from_country",
         "in": "body-json",
         "required": false,
         "type": "string",
-        "description": "Where the package ships from."
+        "description": "Where the package ships from.",
+        "nullable": true
       },
       {
         "name": "ship_to_country",
         "in": "body-json",
         "required": false,
         "type": "string",
-        "description": "Package destination."
+        "description": "Package destination.",
+        "nullable": true
       },
       {
         "name": "incoterm",
         "in": "body-json",
         "required": false,
         "type": "string",
-        "description": "The specific incoterm (e.g., DDU, DDP) designated for the shipment."
+        "description": "The specific incoterm (e.g., DDU, DDP) designated for the shipment.",
+        "nullable": true
       },
       {
         "name": "customs_data",
@@ -665,6 +708,7 @@ export const operations: OperationDescriptor[] = [
         "required": false,
         "type": "array",
         "description": "Contains custom data like country of origin, declared value and HS code.",
+        "nullable": true,
         "items": {
           "type": "object",
           "properties": [
@@ -672,19 +716,22 @@ export const operations: OperationDescriptor[] = [
               "name": "country_of_origin",
               "required": false,
               "type": "string",
-              "description": "The country in which the goods originate from."
+              "description": "The country in which the goods originate from.",
+              "nullable": true
             },
             {
               "name": "declared_value",
               "required": false,
               "type": "number",
-              "description": "The commercial value of the goods."
+              "description": "The commercial value of the goods.",
+              "nullable": true
             },
             {
               "name": "HS_code",
               "required": false,
               "type": "string",
-              "description": "The standardized global system (Harmonized System) for classifying traded products."
+              "description": "The standardized global system (Harmonized System) for classifying traded products.",
+              "nullable": true
             }
           ]
         }
@@ -694,21 +741,24 @@ export const operations: OperationDescriptor[] = [
         "in": "body-json",
         "required": false,
         "type": "number",
-        "description": "The estimated or actual amount of import duties and taxes assessed by customs for the shipment."
+        "description": "The estimated or actual amount of import duties and taxes assessed by customs for the shipment.",
+        "nullable": true
       },
       {
         "name": "duty_currency",
         "in": "body-json",
         "required": false,
         "type": "string",
-        "description": "The currency in which the duty was paid."
+        "description": "The currency in which the duty was paid.",
+        "nullable": true
       },
       {
         "name": "ship_date",
         "in": "body-json",
         "required": false,
         "type": "string",
-        "description": "The date package was shipped."
+        "description": "The date package was shipped.",
+        "nullable": true
       }
     ]
   },
@@ -801,7 +851,8 @@ export const operations: OperationDescriptor[] = [
         "in": "body-form",
         "required": false,
         "type": "string",
-        "description": "The ISO 3166-1 alpha-2 country code that `phone` belongs to, for example `DE`. Optional. Not case-sensitive on input; always returned in upper case."
+        "description": "The ISO 3166-1 alpha-2 country code that `phone` belongs to, for example `DE`. Optional. Not case-sensitive on input; always returned in upper case.",
+        "nullable": true
       },
       {
         "name": "trademark_name",
@@ -913,7 +964,8 @@ export const operations: OperationDescriptor[] = [
         "in": "body-form",
         "required": false,
         "type": "integer",
-        "description": "The deadline for the Return Policy, measured in days. The value must be one of the following: [7, 14, 21, 30, 45, 60, 90]."
+        "description": "The deadline for the Return Policy, measured in days. The value must be one of the following: [7, 14, 21, 30, 45, 60, 90].",
+        "nullable": true
       }
     ]
   },
@@ -2971,14 +3023,16 @@ export const operations: OperationDescriptor[] = [
         "in": "query",
         "required": false,
         "type": "boolean",
-        "description": "When `true`, returns properties that support variations. When `false`, returns properties that do not support variations."
+        "description": "When `true`, returns properties that support variations. When `false`, returns properties that do not support variations.",
+        "nullable": true
       },
       {
         "name": "supports_attributes",
         "in": "query",
         "required": false,
         "type": "boolean",
-        "description": "When `true`, returns properties that support attributes. When `false`, returns properties that do not support attributes."
+        "description": "When `true`, returns properties that support attributes. When `false`, returns properties that do not support attributes.",
+        "nullable": true
       }
     ]
   },
@@ -3024,6 +3078,7 @@ export const operations: OperationDescriptor[] = [
         "required": false,
         "type": "integer",
         "description": "The earliest unix timestamp for when a record was created.",
+        "nullable": true,
         "minimum": 946684800
       },
       {
@@ -3032,6 +3087,7 @@ export const operations: OperationDescriptor[] = [
         "required": false,
         "type": "integer",
         "description": "The latest unix timestamp for when a record was created.",
+        "nullable": true,
         "minimum": 946684800
       }
     ]
@@ -3078,6 +3134,7 @@ export const operations: OperationDescriptor[] = [
         "required": false,
         "type": "integer",
         "description": "The earliest unix timestamp for when a record was created.",
+        "nullable": true,
         "minimum": 946684800
       },
       {
@@ -3086,6 +3143,7 @@ export const operations: OperationDescriptor[] = [
         "required": false,
         "type": "integer",
         "description": "The latest unix timestamp for when a record was created.",
+        "nullable": true,
         "minimum": 946684800
       }
     ]
@@ -3741,28 +3799,32 @@ export const operations: OperationDescriptor[] = [
         "in": "query",
         "required": false,
         "type": "boolean",
-        "description": "When `true`, returns receipts where the seller has received payment for the receipt. When `false`, returns receipts where payment has not been received."
+        "description": "When `true`, returns receipts where the seller has received payment for the receipt. When `false`, returns receipts where payment has not been received.",
+        "nullable": true
       },
       {
         "name": "was_shipped",
         "in": "query",
         "required": false,
         "type": "boolean",
-        "description": "When `true`, returns receipts where the seller shipped the product(s) in this receipt. When `false`, returns receipts where shipment has not been set."
+        "description": "When `true`, returns receipts where the seller shipped the product(s) in this receipt. When `false`, returns receipts where shipment has not been set.",
+        "nullable": true
       },
       {
         "name": "was_delivered",
         "in": "query",
         "required": false,
         "type": "boolean",
-        "description": "When `true`, returns receipts that have been marked as delivered. When `false`, returns receipts where shipment has not been marked as delivered."
+        "description": "When `true`, returns receipts that have been marked as delivered. When `false`, returns receipts where shipment has not been marked as delivered.",
+        "nullable": true
       },
       {
         "name": "was_canceled",
         "in": "query",
         "required": false,
         "type": "boolean",
-        "description": "When `true`, the endpoint will only return the canceled receipts. When `false`, the endpoint will only return non-canceled receipts."
+        "description": "When `true`, the endpoint will only return the canceled receipts. When `false`, the endpoint will only return non-canceled receipts.",
+        "nullable": true
       },
       {
         "name": "legacy",
@@ -4318,6 +4380,7 @@ export const operations: OperationDescriptor[] = [
         "required": false,
         "type": "array",
         "description": "A list of material strings for materials used in the product. Valid materials strings contain only letters, numbers, and whitespace characters. (regex: /[^\\p{L}\\p{Nd}\\p{Zs}]/u) Default value is null.",
+        "nullable": true,
         "items": {
           "type": "string"
         }
@@ -4335,6 +4398,7 @@ export const operations: OperationDescriptor[] = [
         "required": false,
         "type": "integer",
         "description": "The numeric ID of the [shipping profile](/documentation/reference#operation/getShopShippingProfile) associated with the listing. Required when listing type is `physical`.",
+        "nullable": true,
         "minimum": 1
       },
       {
@@ -4343,6 +4407,7 @@ export const operations: OperationDescriptor[] = [
         "required": false,
         "type": "integer",
         "description": "The numeric ID of the [Return Policy](/documentation/reference#operation/getShopReturnPolicies). Required for active physical listings. This requirement does not apply to listings of EU-based shops.",
+        "nullable": true,
         "minimum": 1
       },
       {
@@ -4350,7 +4415,8 @@ export const operations: OperationDescriptor[] = [
         "in": "body-form",
         "required": false,
         "type": "integer",
-        "description": "The numeric ID of the [shop section](/documentation/reference#tag/Shop-Section) for this listing. Default value is null."
+        "description": "The numeric ID of the [shop section](/documentation/reference#tag/Shop-Section) for this listing. Default value is null.",
+        "nullable": true
       },
       {
         "name": "item_weight",
@@ -4358,6 +4424,7 @@ export const operations: OperationDescriptor[] = [
         "required": false,
         "type": "number",
         "description": "The numeric weight of the product measured in units set in 'item_weight_unit'. Default value is null. If set, the value must be greater than 0.",
+        "nullable": true,
         "minimum": 0,
         "maximum": 1.79769313486e+308
       },
@@ -4367,6 +4434,7 @@ export const operations: OperationDescriptor[] = [
         "required": false,
         "type": "number",
         "description": "The numeric length of the product measured in units set in 'item_dimensions_unit'. Default value is null. If set, the value must be greater than 0.",
+        "nullable": true,
         "minimum": 0,
         "maximum": 1.79769313486e+308
       },
@@ -4376,6 +4444,7 @@ export const operations: OperationDescriptor[] = [
         "required": false,
         "type": "number",
         "description": "The numeric width of the product measured in units set in 'item_dimensions_unit'. Default value is null. If set, the value must be greater than 0.",
+        "nullable": true,
         "minimum": 0,
         "maximum": 1.79769313486e+308
       },
@@ -4385,6 +4454,7 @@ export const operations: OperationDescriptor[] = [
         "required": false,
         "type": "number",
         "description": "The numeric height of the product measured in units set in 'item_dimensions_unit'. Default value is null. If set, the value must be greater than 0.",
+        "nullable": true,
         "minimum": 0,
         "maximum": 1.79769313486e+308
       },
@@ -4394,6 +4464,7 @@ export const operations: OperationDescriptor[] = [
         "required": false,
         "type": "string",
         "description": "A string defining the units used to measure the weight of the product. Default value is null.",
+        "nullable": true,
         "enum": [
           "",
           "oz",
@@ -4408,6 +4479,7 @@ export const operations: OperationDescriptor[] = [
         "required": false,
         "type": "string",
         "description": "A string defining the units used to measure the dimensions of the product. Default value is null.",
+        "nullable": true,
         "enum": [
           "",
           "in",
@@ -4440,6 +4512,7 @@ export const operations: OperationDescriptor[] = [
         "required": false,
         "type": "array",
         "description": "A comma-separated list of tag strings for the listing. When creating or updating a listing, valid tag strings contain only letters, numbers, whitespace characters, -, ', ™, ©, and ®. (regex: /[^\\p{L}\\p{Nd}\\p{Zs}\\-'™©®]/u) Default value is null.",
+        "nullable": true,
         "items": {
           "type": "string"
         }
@@ -4508,6 +4581,7 @@ export const operations: OperationDescriptor[] = [
         "required": false,
         "type": "array",
         "description": "An array of unique IDs of production partner ids.",
+        "nullable": true,
         "items": {
           "type": "integer",
           "minimum": 1
@@ -4519,6 +4593,7 @@ export const operations: OperationDescriptor[] = [
         "required": false,
         "type": "string",
         "description": "An enumerated type string that indicates whether the listing is physical or a digital download.",
+        "nullable": true,
         "enum": [
           "physical",
           "download",
@@ -4530,49 +4605,56 @@ export const operations: OperationDescriptor[] = [
         "in": "body-form",
         "required": false,
         "type": "string",
-        "description": "The brand or trademark name for the EU commercial guarantee (required under GPSR/ECGT for eligible EU traders). Maximum 25 characters. See the [Etsy Seller Handbook](https://help.etsy.com/hc/articles/43191692248343) for details. If any one of ecgt_garan_brand, ecgt_garan_model, ecgt_garan_years, or ecgt_garan_guarantee_details is provided and non-empty, all four are required. Silently ignored for digital listings and for sellers who are not eligible EU traders."
+        "description": "The brand or trademark name for the EU commercial guarantee (required under GPSR/ECGT for eligible EU traders). Maximum 25 characters. See the [Etsy Seller Handbook](https://help.etsy.com/hc/articles/43191692248343) for details. If any one of ecgt_garan_brand, ecgt_garan_model, ecgt_garan_years, or ecgt_garan_guarantee_details is provided and non-empty, all four are required. Silently ignored for digital listings and for sellers who are not eligible EU traders.",
+        "nullable": true
       },
       {
         "name": "ecgt_garan_years",
         "in": "body-form",
         "required": false,
         "type": "integer",
-        "description": "Duration of the EU commercial guarantee in whole years (minimum 3, maximum 99). Required together with ecgt_garan_brand, ecgt_garan_model, and ecgt_garan_guarantee_details. Silently ignored for digital listings and for sellers who are not eligible EU traders."
+        "description": "Duration of the EU commercial guarantee in whole years (minimum 3, maximum 99). Required together with ecgt_garan_brand, ecgt_garan_model, and ecgt_garan_guarantee_details. Silently ignored for digital listings and for sellers who are not eligible EU traders.",
+        "nullable": true
       },
       {
         "name": "ecgt_garan_model",
         "in": "body-form",
         "required": false,
         "type": "string",
-        "description": "The product model or reference number for the EU commercial guarantee label. Maximum 20 characters. Required together with ecgt_garan_brand, ecgt_garan_years, and ecgt_garan_guarantee_details. Silently ignored for digital listings and for sellers who are not eligible EU traders."
+        "description": "The product model or reference number for the EU commercial guarantee label. Maximum 20 characters. Required together with ecgt_garan_brand, ecgt_garan_years, and ecgt_garan_guarantee_details. Silently ignored for digital listings and for sellers who are not eligible EU traders.",
+        "nullable": true
       },
       {
         "name": "ecgt_garan_guarantee_details",
         "in": "body-form",
         "required": false,
         "type": "string",
-        "description": "Free-text description of the EU commercial guarantee terms and coverage. Maximum 255 characters. Required together with ecgt_garan_brand, ecgt_garan_model, and ecgt_garan_years. Silently ignored for digital listings and for sellers who are not eligible EU traders."
+        "description": "Free-text description of the EU commercial guarantee terms and coverage. Maximum 255 characters. Required together with ecgt_garan_brand, ecgt_garan_model, and ecgt_garan_years. Silently ignored for digital listings and for sellers who are not eligible EU traders.",
+        "nullable": true
       },
       {
         "name": "ecgt_other_commercial_guarantee_details",
         "in": "body-form",
         "required": false,
         "type": "string",
-        "description": "Free-text details of any additional commercial guarantee or warranty beyond the primary EU commercial guarantee. Maximum 255 characters. Silently ignored for digital listings and for sellers who are not eligible EU traders."
+        "description": "Free-text details of any additional commercial guarantee or warranty beyond the primary EU commercial guarantee. Maximum 255 characters. Silently ignored for digital listings and for sellers who are not eligible EU traders.",
+        "nullable": true
       },
       {
         "name": "ecgt_after_sales_service_info",
         "in": "body-form",
         "required": false,
         "type": "string",
-        "description": "After-sales service, repairability, or eco-friendly delivery information required under EU GPSR/ECGT regulations. Maximum 255 characters. Silently ignored for digital listings and for sellers who are not eligible EU traders."
+        "description": "After-sales service, repairability, or eco-friendly delivery information required under EU GPSR/ECGT regulations. Maximum 255 characters. Silently ignored for digital listings and for sellers who are not eligible EU traders.",
+        "nullable": true
       },
       {
         "name": "ecgt_software_update_details",
         "in": "body-form",
         "required": false,
         "type": "string",
-        "description": "Details of software update availability and the duration of such updates, as required under EU ECGT regulations for digital content. Maximum 255 characters. Silently ignored for physical listings and for sellers who are not eligible EU traders."
+        "description": "Details of software update availability and the duration of such updates, as required under EU ECGT regulations for digital content. Maximum 255 characters. Silently ignored for physical listings and for sellers who are not eligible EU traders.",
+        "nullable": true
       },
       {
         "name": "gpsr_manufacturer_type",
@@ -4580,6 +4662,7 @@ export const operations: OperationDescriptor[] = [
         "required": false,
         "type": "string",
         "description": "Who the manufacturer of this product is, for GPSR (EU General Product Safety Regulation) purposes. Either `seller` (your shop is the manufacturer) or `economic_operator` (a manufacturer record from the [Shop Economic Operators](/documentation/reference#tag/Shop-Economic-Operators) endpoints, identified by `gpsr_manufacturer_id`). `seller` is rejected when `who_made` is `someone_else`; use `economic_operator` for items made by a third party. Send `null` to clear. Optional for now; it becomes required for listings from eligible traders that sell into the EU 60 days after these fields were announced. See the [GPSR Economic Operators Tutorial](/documentation/tutorials/gpsr-economic-operators) for eligibility and the full flow.",
+        "nullable": true,
         "enum": [
           "seller",
           "economic_operator"
@@ -4590,7 +4673,8 @@ export const operations: OperationDescriptor[] = [
         "in": "body-form",
         "required": false,
         "type": "integer",
-        "description": "The `economic_operator_id` of the manufacturer, from the [Shop Economic Operators](/documentation/reference#tag/Shop-Economic-Operators) endpoints. Required when `gpsr_manufacturer_type` is `economic_operator`, and rejected when the type is anything else. The operator must belong to this shop and not be deleted. The manufacturer may be located anywhere in the world. If you change `gpsr_manufacturer_type` to `seller` without sending this field, the stored id is cleared for you."
+        "description": "The `economic_operator_id` of the manufacturer, from the [Shop Economic Operators](/documentation/reference#tag/Shop-Economic-Operators) endpoints. Required when `gpsr_manufacturer_type` is `economic_operator`, and rejected when the type is anything else. The operator must belong to this shop and not be deleted. The manufacturer may be located anywhere in the world. If you change `gpsr_manufacturer_type` to `seller` without sending this field, the stored id is cleared for you.",
+        "nullable": true
       },
       {
         "name": "gpsr_responsible_person_type",
@@ -4598,6 +4682,7 @@ export const operations: OperationDescriptor[] = [
         "required": false,
         "type": "string",
         "description": "Who the EU responsible person for this product is, for GPSR purposes. Either `seller` (your shop; only valid when the shop's legal address, or the address on file, is in the European Union) or `economic_operator` (a record from the [Shop Economic Operators](/documentation/reference#tag/Shop-Economic-Operators) endpoints, identified by `gpsr_responsible_person_id`, which must have an address in the European Union). Send `null` to clear. Optional for now; it becomes required for listings from eligible traders that sell into the EU 60 days after these fields were announced. See the [GPSR Economic Operators Tutorial](/documentation/tutorials/gpsr-economic-operators) for eligibility and the full flow.",
+        "nullable": true,
         "enum": [
           "seller",
           "economic_operator"
@@ -4608,21 +4693,24 @@ export const operations: OperationDescriptor[] = [
         "in": "body-form",
         "required": false,
         "type": "integer",
-        "description": "The `economic_operator_id` of the EU responsible person, from the [Shop Economic Operators](/documentation/reference#tag/Shop-Economic-Operators) endpoints. Required when `gpsr_responsible_person_type` is `economic_operator`, and rejected when the type is anything else. The operator must belong to this shop and not be deleted, and its address must be in the European Union. If you change `gpsr_responsible_person_type` to `seller` without sending this field, the stored id is cleared for you."
+        "description": "The `economic_operator_id` of the EU responsible person, from the [Shop Economic Operators](/documentation/reference#tag/Shop-Economic-Operators) endpoints. Required when `gpsr_responsible_person_type` is `economic_operator`, and rejected when the type is anything else. The operator must belong to this shop and not be deleted, and its address must be in the European Union. If you change `gpsr_responsible_person_type` to `seller` without sending this field, the stored id is cleared for you.",
+        "nullable": true
       },
       {
         "name": "gpsr_serial_number",
         "in": "body-form",
         "required": false,
         "type": "string",
-        "description": "An optional serial number, batch number, or lot identifier that lets the product be traced for GPSR purposes. Maximum 255 characters. Send `null` to clear."
+        "description": "An optional serial number, batch number, or lot identifier that lets the product be traced for GPSR purposes. Maximum 255 characters. Send `null` to clear.",
+        "nullable": true
       },
       {
         "name": "gpsr_safety_warnings",
         "in": "body-form",
         "required": false,
         "type": "string",
-        "description": "Optional free-text safety warnings and safety information for the product regarding GPSR purposes, shown to buyers as product safety information on the listing page (for example age restrictions, choking hazards, or care and handling instructions). Maximum 102,400 characters. Send `null` to clear."
+        "description": "Optional free-text safety warnings and safety information for the product regarding GPSR purposes, shown to buyers as product safety information on the listing page (for example age restrictions, choking hazards, or care and handling instructions). Maximum 102,400 characters. Send `null` to clear.",
+        "nullable": true
       }
     ]
   },
@@ -4678,7 +4766,8 @@ export const operations: OperationDescriptor[] = [
               "name": "sku",
               "required": false,
               "type": "string",
-              "description": "The SKU string for the product"
+              "description": "The SKU string for the product",
+              "nullable": true
             },
             {
               "name": "property_values",
@@ -4710,6 +4799,7 @@ export const operations: OperationDescriptor[] = [
                     "required": false,
                     "type": "integer",
                     "description": "The numeric ID of a single Etsy.com measurement scale. For example, for shoe size, there are three `scale_id`s available - `UK`, `US/Canada`, and `EU`, where `US/Canada` has `scale_id` 19.",
+                    "nullable": true,
                     "minimum": 1
                   },
                   {
@@ -4761,6 +4851,7 @@ export const operations: OperationDescriptor[] = [
                     "required": false,
                     "type": "integer",
                     "description": "The numeric ID of the [processing profile](/documentation/reference#operation/getShopReadinessStateDefinition) associated with the listing. Returned only when the listing is `active` and of type `physical`, and the endpoint is either shop-scoped (path contains `shop_id`) or a single-listing request such as `getListing`. For every other case this field can be null.",
+                    "nullable": true,
                     "minimum": 1
                   }
                 ]
@@ -4805,6 +4896,7 @@ export const operations: OperationDescriptor[] = [
         "required": false,
         "type": "array",
         "description": "An array of unique [listing property](/documentation/reference#operation/getListingInventory) ID integers for the properties that change processing profile, if any. For example, if you need specific processing profiles for different colored products in the same listing, then this array contains the property ID for color.",
+        "nullable": true,
         "items": {
           "type": "integer",
           "minimum": 1
@@ -4846,7 +4938,8 @@ export const operations: OperationDescriptor[] = [
         "in": "query",
         "required": false,
         "type": "boolean",
-        "description": "This query parameter indicates that the caller supports up to 5 personalization questions and the following question types: 'text_input', 'dropdown', 'unlabeled_upload', 'labeled_upload'. Sending this param without updating your application can lead to inadvertently deleting seller-entered data."
+        "description": "This query parameter indicates that the caller supports up to 5 personalization questions and the following question types: 'text_input', 'dropdown', 'unlabeled_upload', 'labeled_upload'. Sending this param without updating your application can lead to inadvertently deleting seller-entered data.",
+        "nullable": true
       },
       {
         "name": "personalization_questions",
@@ -4861,6 +4954,7 @@ export const operations: OperationDescriptor[] = [
               "required": false,
               "type": "integer",
               "description": "The ID of the personalization question. This field is optional. Include it when updating an existing question; omit it when creating a new question. Note: This value may change if the personalization question is updated.",
+              "nullable": true,
               "minimum": 1
             },
             {
@@ -4873,7 +4967,8 @@ export const operations: OperationDescriptor[] = [
               "name": "instructions",
               "required": false,
               "type": "string",
-              "description": "Optional instructions for a personalization question. This field is not allowed for 'dropdown' questions. See https://developers.etsy.com/documentation/tutorials/personalization-migration#writing-listing-personalization-data"
+              "description": "Optional instructions for a personalization question. This field is not allowed for 'dropdown' questions. See https://developers.etsy.com/documentation/tutorials/personalization-migration#writing-listing-personalization-data",
+              "nullable": true
             },
             {
               "name": "question_type",
@@ -4897,19 +4992,22 @@ export const operations: OperationDescriptor[] = [
               "name": "max_allowed_files",
               "required": false,
               "type": "integer",
-              "description": "The maximum number of files the buyer may upload in response to a personalization question. This field is optional and only applicable to 'unlabeled_upload' and 'labeled_upload' questions."
+              "description": "The maximum number of files the buyer may upload in response to a personalization question. This field is optional and only applicable to 'unlabeled_upload' and 'labeled_upload' questions.",
+              "nullable": true
             },
             {
               "name": "max_allowed_characters",
               "required": false,
               "type": "integer",
-              "description": "The maximum number of characters the buyer may enter in response to a personalization question. This field is optional and only applicable to 'text_input' questions."
+              "description": "The maximum number of characters the buyer may enter in response to a personalization question. This field is optional and only applicable to 'text_input' questions.",
+              "nullable": true
             },
             {
               "name": "options",
               "required": false,
               "type": "array",
               "description": "The list of options for a personalization question. For 'dropdown' questions, this list contains the options for the dropdown. For 'labeled_upload' questions, this list contains the labels for the files that the buyer may upload, and must match the max_allowed_files value..",
+              "nullable": true,
               "items": {
                 "type": "object",
                 "properties": [
@@ -4918,6 +5016,7 @@ export const operations: OperationDescriptor[] = [
                     "required": false,
                     "type": "integer",
                     "description": "The ID of the option. This field is optional. Include it when updating an existing option; omit it when creating a new option. Note: This value may change if the option or question is updated.",
+                    "nullable": true,
                     "minimum": 1
                   },
                   {
@@ -4933,7 +5032,8 @@ export const operations: OperationDescriptor[] = [
               "name": "add_on_price",
               "required": false,
               "type": "number",
-              "description": "The add-on price for a question. This field is optional and only supported for optional questions of type text_input."
+              "description": "The add-on price for a question. This field is optional and only supported for optional questions of type text_input.",
+              "nullable": true
             }
           ]
         }
@@ -5184,7 +5284,8 @@ export const operations: OperationDescriptor[] = [
         "in": "body-form",
         "required": false,
         "type": "string",
-        "description": "The second line of the economic operator's postal address (apartment, suite, building). Optional. Maximum 50 characters (95 in a few countries, such as India, Brazil, and Japan). Send `null` on update to clear it. Returned as `null` when not set."
+        "description": "The second line of the economic operator's postal address (apartment, suite, building). Optional. Maximum 50 characters (95 in a few countries, such as India, Brazil, and Japan). Send `null` on update to clear it. Returned as `null` when not set.",
+        "nullable": true
       },
       {
         "name": "city",
@@ -5198,7 +5299,8 @@ export const operations: OperationDescriptor[] = [
         "in": "body-form",
         "required": false,
         "type": "string",
-        "description": "The state, province, or region of the economic operator's postal address. Required if the `country_iso` requires a state; optional otherwise. Maximum 50 characters (95 in a few countries, such as India, Brazil, and Japan). See the [list of countries](/documentation/tutorials/gpsr-economic-operators#countries-requiring-a-state). On update, send `null` to clear it (not allowed for those countries). Returned as `null` when not set."
+        "description": "The state, province, or region of the economic operator's postal address. Required if the `country_iso` requires a state; optional otherwise. Maximum 50 characters (95 in a few countries, such as India, Brazil, and Japan). See the [list of countries](/documentation/tutorials/gpsr-economic-operators#countries-requiring-a-state). On update, send `null` to clear it (not allowed for those countries). Returned as `null` when not set.",
+        "nullable": true
       },
       {
         "name": "zip",
@@ -5226,14 +5328,16 @@ export const operations: OperationDescriptor[] = [
         "in": "body-form",
         "required": false,
         "type": "string",
-        "description": "The ISO 3166-1 alpha-2 country code that `phone` belongs to, for example `DE`. Optional. Not case-sensitive on input; always returned in upper case."
+        "description": "The ISO 3166-1 alpha-2 country code that `phone` belongs to, for example `DE`. Optional. Not case-sensitive on input; always returned in upper case.",
+        "nullable": true
       },
       {
         "name": "trademark_name",
         "in": "body-form",
         "required": false,
         "type": "string",
-        "description": "The brand or trademark the economic operator trades under, when it differs from `operator_name`. Optional. Maximum 255 characters. Send `null` on update to clear it. Returned as `null` when not set."
+        "description": "The brand or trademark the economic operator trades under, when it differs from `operator_name`. Optional. Maximum 255 characters. Send `null` on update to clear it. Returned as `null` when not set.",
+        "nullable": true
       }
     ]
   },
@@ -5349,14 +5453,16 @@ export const operations: OperationDescriptor[] = [
         "in": "body-form",
         "required": false,
         "type": "boolean",
-        "description": "When `true`, returns receipts where the seller shipped the product(s) in this receipt. When `false`, returns receipts where shipment has not been set."
+        "description": "When `true`, returns receipts where the seller shipped the product(s) in this receipt. When `false`, returns receipts where shipment has not been set.",
+        "nullable": true
       },
       {
         "name": "was_paid",
         "in": "body-form",
         "required": false,
         "type": "boolean",
-        "description": "When `true`, returns receipts where the seller has received payment for the receipt. When `false`, returns receipts where payment has not been received."
+        "description": "When `true`, returns receipts where the seller has received payment for the receipt. When `false`, returns receipts where payment has not been received.",
+        "nullable": true
       }
     ]
   },
@@ -5406,7 +5512,8 @@ export const operations: OperationDescriptor[] = [
         "in": "body-form",
         "required": false,
         "type": "integer",
-        "description": "The deadline for the Return Policy, measured in days. The value must be one of the following: [7, 14, 21, 30, 45, 60, 90]."
+        "description": "The deadline for the Return Policy, measured in days. The value must be one of the following: [7, 14, 21, 30, 45, 60, 90].",
+        "nullable": true
       }
     ]
   },
@@ -5845,7 +5952,8 @@ export const operations: OperationDescriptor[] = [
         "in": "body-multipart-file",
         "required": false,
         "type": "string",
-        "description": "A binary file to upload."
+        "description": "A binary file to upload.",
+        "nullable": true
       },
       {
         "name": "name",
@@ -5898,7 +6006,8 @@ export const operations: OperationDescriptor[] = [
         "in": "body-multipart-file",
         "required": false,
         "type": "string",
-        "description": "The file name string of a file to upload"
+        "description": "The file name string of a file to upload",
+        "nullable": true
       },
       {
         "name": "listing_image_id",
@@ -5981,7 +6090,8 @@ export const operations: OperationDescriptor[] = [
         "in": "body-multipart-file",
         "required": false,
         "type": "string",
-        "description": "A video file to upload."
+        "description": "A video file to upload.",
+        "nullable": true
       },
       {
         "name": "name",

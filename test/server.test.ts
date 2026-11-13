@@ -116,7 +116,7 @@ describe("input validation", () => {
     const { tools } = await client.listTools();
     const schema = (n: string) => tools.find((t) => t.name === n)!.inputSchema as {
       required?: string[];
-      properties: Record<string, { type?: string; items?: { type?: string }; maximum?: number }>;
+      properties: Record<string, { type?: string | string[]; items?: { type?: string }; maximum?: number }>;
     };
     const byIds = schema("get_listings_by_listing_ids");
     expect(byIds.required).toEqual(["listing_ids"]);
@@ -129,7 +129,7 @@ describe("input validation", () => {
 
     const receipts = schema("get_shop_receipts");
     expect(receipts.required).toEqual(["shop_id"]);
-    expect(receipts.properties.was_paid.type).toBe("boolean");
+    expect(receipts.properties.was_paid.type).toEqual(["boolean", "null"]);
   });
 });
 

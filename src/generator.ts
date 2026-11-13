@@ -120,6 +120,7 @@ function deref(spec: any, node: any): any {
 function toValueSchema(spec: any, raw: any): ValueSchema {
   const s = deref(spec, raw) ?? {};
   const out: ValueSchema = { type: s.type };
+  if (s.nullable === true) out.nullable = true;
   if (typeof s.minimum === "number") out.minimum = s.minimum;
   if (typeof s.maximum === "number") out.maximum = s.maximum;
   if (Array.isArray(s.enum)) out.enum = s.enum;
