@@ -1,3 +1,4 @@
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { generateOperations, TAG_TOOLSETS, toToolName } from "../src/generator.js";
 
@@ -147,12 +148,10 @@ describe("Toolset assignment", () => {
     expect(withTags([tag])[0].toolset).toBe(toolset);
   });
 
-  it("maps every tag in the Spec Snapshot to exactly one Toolset", async () => {
-    const snapshot = JSON.parse(
-      (await import("node:fs")).readFileSync(new URL("../spec/etsy-openapi.json", import.meta.url), "utf8"),
-    );
-    for (const { name } of snapshot.tags) expect(TAG_TOOLSETS).toHaveProperty([name]);
-    expect(generateOperations(snapshot).every((op) => op.toolset)).toBe(true);
+  it("maps exactly the tags in the Spec Snapshot", () => {
+    const snapshot = JSON.parse(readFileSync(new URL("../spec/etsy-openapi.json", import.meta.url), "utf8"));
+    expect(Object.keys(TAG_TOOLSETS).sort()).toEqual(snapshot.tags.map((t: { name: string }) => t.name).sort());
+    expect(() => generateOperations(snapshot)).not.toThrow();
   });
 });
 

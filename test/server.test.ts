@@ -33,12 +33,13 @@ describe("ETSY_TOOLSETS", () => {
   });
 
   it("offers only Tools from the selected Toolsets", async () => {
-    const { names, sets } = await listedToolsets(["listings", "orders"]);
-    expect(names.length).toBeGreaterThan(0);
-    expect(names.length).toBeLessThan(64);
-    expect(sets).toEqual(new Set(["listings", "orders"]));
-    expect(names).toContain("get_listing");
-    expect(names).not.toContain("get_shop");
+    const { names } = await listedToolsets(["listings", "orders"]);
+    const expected = operations
+      .filter((op) => !op.write && (op.toolset === "listings" || op.toolset === "orders"))
+      .map((op) => op.toolName)
+      .sort();
+    expect(expected.length).toBeGreaterThan(0);
+    expect([...names].sort()).toEqual(expected);
   });
 
   it("a single Toolset narrows further", async () => {
