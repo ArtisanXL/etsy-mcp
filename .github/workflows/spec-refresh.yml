@@ -21,8 +21,6 @@ jobs:
     timeout-minutes: 15
     env:
       BRANCH: chore/spec-refresh
-      # PRs opened with GITHUB_TOKEN do not trigger CI; set SPEC_REFRESH_TOKEN (a PAT) to get CI on the PR
-      GH_TOKEN: ${{ secrets.SPEC_REFRESH_TOKEN || secrets.GITHUB_TOKEN }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -31,7 +29,7 @@ jobs:
         with:
           node-version: 24
           cache: npm
-      - run: npm ci
+      - run: npm ci --ignore-scripts
       # Fails the job (and so opens no PR) on a bad download, an unmapped tag, a missing operationId or a duplicate Tool name.
       - run: npm run gen
       - name: Detect changes
@@ -44,13 +42,18 @@ jobs:
             echo "changed=true" >> "$GITHUB_OUTPUT"
             git status --short
           fi
-      - name: Typecheck and test the regenerated output
+      - name: Typecheck, test and build the regenerated output
         if: steps.diff.outputs.changed == 'true'
         run: |
           npm run typecheck
           npm test
+          npm run build
+      # Without the optional SPEC_REFRESH_TOKEN secret (a PAT), this uses GITHUB_TOKEN, which needs the repo setting
+      # "Allow GitHub Actions to create and approve pull requests" and whose PRs do not trigger CI.
       - name: Open or update PR
         if: steps.diff.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.SPEC_REFRESH_TOKEN || secrets.GITHUB_TOKEN }}
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -64,4 +67,12 @@ jobs:
             gh pr create --base main --head "$BRANCH" \
               --title "Refresh Etsy Spec Snapshot" \
               --body "Automated weekly refresh: \`npm run gen\` downloaded the latest Etsy Open API v3 spec into \`spec/\` and regenerated \`src/generated/\`. Review the diff for new, changed or removed Operations. Never hand-resolve conflicts in the generated output: rebase and re-run \`npm run gen:local\`."
+          fi
+      - name: Close stale refresh PR
+        if: steps.diff.outputs.changed == 'false'
+        env:
+          GH_TOKEN: ${{ secrets.SPEC_REFRESH_TOKEN || secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -n "$(gh pr list --head "$BRANCH" --state open --json number --jq '.[].number')" ]; then
+            gh pr close "$BRANCH" --delete-branch --comment "Spec Snapshot is up to date with Etsy again; closing."
           fi
