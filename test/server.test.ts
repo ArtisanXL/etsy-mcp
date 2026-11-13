@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { loadConfig } from "../src/config.js";
+import { valueSchema } from "../src/server.js";
 import { connect } from "./harness.js";
 
 describe("tools/list", () => {
@@ -74,13 +75,16 @@ describe("input validation", () => {
     ["non-integer", "get_listing", { listing_id: 1.5 }],
     ["missing required", "get_listing", {}],
     ["array item below minimum", "get_listings_by_listing_ids", { listing_ids: [0] }],
+    ["empty array", "get_listings_by_listing_ids", { listing_ids: [] }],
+    ["empty optional array", "get_listings_by_listing_ids", { listing_ids: [1], includes: [] }],
     ["scalar for array", "get_listings_by_listing_ids", { listing_ids: 5 }],
   ];
 
   it.each(rejected)("rejects %s before any HTTP call", async (_label, name, args) => {
     const { client, requests } = await connect();
-    const res = await client.callTool({ name, arguments: args }).catch((e) => ({ isError: true, e }));
+    const res = await client.callTool({ name, arguments: args });
     expect(res.isError).toBe(true);
+    expect(JSON.stringify(res.content)).toMatch(/Input validation error/);
     expect(requests).toHaveLength(0);
   });
 
@@ -103,6 +107,15 @@ describe("input validation", () => {
     const receipts = schema("get_shop_receipts");
     expect(receipts.required).toEqual(["shop_id"]);
     expect(receipts.properties.was_paid.type).toBe("boolean");
+  });
+});
+
+describe("valueSchema", () => {
+  it("enforces numeric enums", () => {
+    const s = valueSchema({ type: "integer", enum: [1, 2, 3] });
+    expect(s.safeParse(2).success).toBe(true);
+    expect(s.safeParse(4).success).toBe(false);
+    expect(valueSchema({ type: "number", enum: [1.5] }).safeParse(2).success).toBe(false);
   });
 });
 

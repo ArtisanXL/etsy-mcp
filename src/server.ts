@@ -8,9 +8,13 @@ export type FetchLike = (url: URL, init: { headers: Record<string, string> }) =>
 
 const API_BASE = "https://openapi.etsy.com";
 
-function valueSchema(v: ValueSchema): z.ZodType {
+export function valueSchema(v: ValueSchema): z.ZodType {
   if (v.type === "array") {
-    return z.array(v.items ? valueSchema(v.items) : z.string());
+    return z.array(v.items ? valueSchema(v.items) : z.string()).min(1);
+  }
+  if (v.enum && (v.type === "integer" || v.type === "number")) {
+    const literals = v.enum.map((e) => z.literal(e));
+    return literals.length === 1 ? literals[0] : z.union(literals as [z.ZodLiteral, z.ZodLiteral, ...z.ZodLiteral[]]);
   }
   if (v.type === "integer" || v.type === "number") {
     let n = v.type === "integer" ? z.number().int() : z.number();
@@ -33,15 +37,14 @@ export function createServer(config: Config, fetchImpl: FetchLike = fetch): McpS
   const server = new McpServer({ name: "etsy-mcp", version: "0.1.1" });
 
   for (const op of operations.filter((op) => !op.write)) {
-    const params = op.params;
-    const inputSchema = Object.fromEntries(params.map((p) => [p.name, paramSchema(p)]));
+    const inputSchema = Object.fromEntries(op.params.map((p) => [p.name, paramSchema(p)]));
     server.registerTool(
       op.toolName,
       { description: op.description, inputSchema },
       async (args: Record<string, unknown>) => {
         let path = op.path;
         const url = new URL(API_BASE);
-        for (const p of params) {
+        for (const p of op.params) {
           const v = args[p.name];
           if (v === undefined) continue;
           if (p.in === "path") path = path.replace(`{${p.name}}`, encodeURIComponent(String(v)));
