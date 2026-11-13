@@ -12,7 +12,7 @@ npm run build
 ```
 
 Test locally with an MCP client by pointing it at `node /path/to/etsy-mcp/dist/index.js`
-and setting `ETSY_API_KEY`.
+and setting `ETSY_API_KEY` and `ETSY_SHARED_SECRET`.
 
 ## Pull Requests
 
