@@ -44,7 +44,7 @@ npm install
 npm run build
 ```
 
-Releases are published to npm automatically (with provenance) when a GitHub Release is published.
+Releases are published to npm automatically via trusted publishing (OIDC, with provenance) when a GitHub Release is published.
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) and [SECURITY.md](SECURITY.md).
 
