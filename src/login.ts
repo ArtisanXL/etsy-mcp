@@ -2,7 +2,7 @@ import { createHash, randomBytes } from "node:crypto";
 import { createServer, type Server } from "node:http";
 import type { AddressInfo } from "node:net";
 import { operations } from "./generated/operations.js";
-import { readTokens, TOKEN_URL, writeTokens, type TokenFetch, type TokenPair } from "./token-store.js";
+import { TOKEN_URL, writeTokens, type TokenFetch, type TokenPair } from "./token-store.js";
 
 export const AUTHORIZE_URL = "https://www.etsy.com/oauth/connect";
 export const DEFAULT_REDIRECT_PORT = 3003;
@@ -31,8 +31,11 @@ export function parseLoginArgs(args: string[]): LoginArgs {
       throw new Error(`Unknown argument for login: ${arg}. Usage: login [--scopes a,b]`);
     }
     const list = value.split(",").map((s) => s.trim());
-    if (list.some((s) => s === "")) {
-      throw new Error(`--scopes has an empty entry. Valid scopes used by Etsy Operations: ${allScopes().join(", ")}`);
+    const valid = allScopes();
+    const bad = list.filter((s) => !valid.includes(s));
+    if (bad.length > 0) {
+      const shown = bad.map((s) => (s === "" ? "(empty entry)" : `"${s}"`)).join(", ");
+      throw new Error(`Unknown scope in --scopes: ${shown}. Valid scopes: ${valid.join(", ")}`);
     }
     scopes = [...new Set(list)];
   }
@@ -42,8 +45,8 @@ export function parseLoginArgs(args: string[]): LoginArgs {
 export function parseRedirectPort(raw: string | undefined): number {
   if (raw === undefined || raw === "") return DEFAULT_REDIRECT_PORT;
   const port = Number(raw);
-  if (!Number.isInteger(port) || port < 0 || port > 65535) {
-    throw new Error(`ETSY_REDIRECT_PORT must be an integer between 0 and 65535, got "${raw}"`);
+  if (!Number.isInteger(port) || port < 1 || port > 65535) {
+    throw new Error(`ETSY_REDIRECT_PORT must be an integer between 1 and 65535, got "${raw}"`);
   }
   return port;
 }
@@ -130,7 +133,9 @@ export async function runLogin(opts: LoginOptions, deps: LoginDeps): Promise<Tok
       state,
       code_challenge: challenge,
       code_challenge_method: "S256",
-    }).toString();
+    })
+      .toString()
+      .replace(/\+/g, "%20");
 
     log(`Open this URL in your browser to authorize (redirect URI: ${redirectUri}):\n${authorizeUrl.href}`);
     try {
@@ -170,12 +175,9 @@ export async function runLogin(opts: LoginOptions, deps: LoginDeps): Promise<Tok
       throw new Error("Etsy token exchange returned an unexpected response: expected access_token, refresh_token and expires_in.");
     }
 
-    // The login result must not be clobbered by a stale ETSY_REFRESH_TOKEN on the next server start: record the
-    // env value as already seeded. With no env value here, keep whatever seed marker the old file had, since the
-    // server's own environment (e.g. an MCP client config) probably still carries that same value.
-    const seed_sha256 = opts.seedRefreshToken
-      ? sha256(opts.seedRefreshToken)
-      : (await readTokens(opts.configDir).catch(() => undefined))?.seed_sha256;
+    // Recording the env refresh token as already seeded keeps a stale ETSY_REFRESH_TOKEN from clobbering this
+    // login on the next server start. Without an env value the file stays unmarked, which also wins over env.
+    const seed_sha256 = opts.seedRefreshToken ? sha256(opts.seedRefreshToken) : undefined;
     const pair: TokenPair = {
       access_token: body.access_token,
       refresh_token: body.refresh_token,

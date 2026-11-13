@@ -196,19 +196,14 @@ describe("refresh", () => {
     expect(requests.filter(isToken)).toHaveLength(1);
   });
 
-  it("ETSY_REFRESH_TOKEN seeds the store when the file holds a different refresh token", async () => {
+  it("an unmarked token file (e.g. from login) wins over ETSY_REFRESH_TOKEN and is marked as seeded", async () => {
     const configDir = tempConfigDir();
-    seedFile(configDir, { access_token: "file-access", refresh_token: "r-file", expires_at: NOW + 3_600_000 });
-    const { client, requests } = await connect(
-      { configDir, refreshToken: "r-env" },
-      (req) => (isToken(req) ? tokenResponse("env-access", "r-env2") : new Response("{}")),
-      { now },
-    );
+    seedFile(configDir, { access_token: "login-access", refresh_token: "r-login", expires_at: NOW + 3_600_000 });
+    const { client, requests } = await connect({ configDir, refreshToken: "r-env" }, undefined, { now });
     await client.callTool(RECEIPTS);
-    await client.callTool(RECEIPTS);
-    expect(new URLSearchParams(requests[0].body).get("refresh_token")).toBe("r-env");
-    expect(requests.filter(isToken)).toHaveLength(1);
-    expect(requests.at(-1)!.headers.Authorization).toBe("Bearer env-access");
+    expect(requests).toHaveLength(1);
+    expect(requests[0].headers.Authorization).toBe("Bearer login-access");
+    expect(await readFileTokens(configDir)).toMatchObject({ refresh_token: "r-login", seed_sha256: sha("r-env") });
   });
 
   it("a stale ETSY_REFRESH_TOKEN does not overwrite a rotated token it already seeded", async () => {

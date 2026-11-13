@@ -62,11 +62,13 @@ describe("authorize URL", () => {
     const { opened, promise } = setup({ scopes }, goodCallback);
     await promise;
     expect(opened[0].searchParams.get("scope")).toBe("listings_r shops_r");
+    expect(opened[0].href).toContain("scope=listings_r%20shops_r");
   });
 
   it("rejects malformed --scopes and unknown arguments", () => {
     expect(() => parseLoginArgs(["--scopes"])).toThrow(/requires/);
-    expect(() => parseLoginArgs(["--scopes", "a,,b"])).toThrow(/empty/);
+    expect(() => parseLoginArgs(["--scopes", "listings_r,,shops_r"])).toThrow(/empty entry/);
+    expect(() => parseLoginArgs(["--scopes", "listing_r"])).toThrow(/Unknown scope.*"listing_r".*listings_r/);
     expect(() => parseLoginArgs(["--bogus"])).toThrow(/Unknown argument/);
     expect(parseLoginArgs([]).scopes).toBeUndefined();
   });
@@ -160,21 +162,17 @@ describe("seed_sha256 after login", () => {
     expect(requests[0].headers.Authorization).toBe("Bearer acc");
   });
 
-  it("keeps an existing seed marker when login runs without the env value", async () => {
-    const configDir = tempConfigDir();
-    mkdirSync(configDir, { recursive: true });
-    writeFileSync(
-      join(configDir, "tokens.json"),
-      JSON.stringify({ access_token: "o", refresh_token: "o", expires_at: 1, seed_sha256: sha("mcp-env") }),
+  it("an unmarked login result wins over an ETSY_REFRESH_TOKEN set only on the server", async () => {
+    const { configDir, promise } = setup({}, goodCallback);
+    await promise;
+    const { client, requests } = await connect(
+      { configDir, refreshToken: "mcp-env" },
+      () => new Response("{}"),
+      { now: () => NOW },
     );
-    const opts = { apiKey: "key", port: 0, configDir };
-    await runLogin(opts, {
-      now: () => NOW,
-      openBrowser: goodCallbackOpener,
-      fetch: async () => new Response(JSON.stringify({ access_token: "acc", refresh_token: "ref", expires_in: 60 })),
-    });
-    const saved = JSON.parse(await readFile(join(configDir, "tokens.json"), "utf8"));
-    expect(saved.seed_sha256).toBe(sha("mcp-env"));
+    await client.callTool({ name: "get_shop_receipts", arguments: { shop_id: 1 } });
+    expect(requests).toHaveLength(1);
+    expect(requests[0].headers.Authorization).toBe("Bearer acc");
   });
 
   it("omits seed_sha256 when there is nothing to remember", async () => {
@@ -189,6 +187,7 @@ describe("ETSY_REDIRECT_PORT", () => {
     expect(parseRedirectPort(undefined)).toBe(3003);
     expect(parseRedirectPort("4000")).toBe(4000);
     expect(() => parseRedirectPort("abc")).toThrow(/ETSY_REDIRECT_PORT/);
+    expect(() => parseRedirectPort("0")).toThrow(/ETSY_REDIRECT_PORT/);
     expect(() => parseRedirectPort("70000")).toThrow(/ETSY_REDIRECT_PORT/);
   });
 

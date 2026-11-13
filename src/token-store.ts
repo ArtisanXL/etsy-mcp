@@ -31,7 +31,7 @@ export type TokenFetch = (url: URL, init: TokenFetchInit) => Promise<Response>;
 export interface TokenStoreOptions {
   configDir: string;
   apiKey: string;
-  /** From ETSY_REFRESH_TOKEN; seeds the store when the file is absent or this value has not been seeded before. */
+  /** From ETSY_REFRESH_TOKEN; seeds the store when the file is absent or was seeded from a different value; an unmarked file (e.g. from `login`) wins. */
   seedRefreshToken?: string;
   fetch: TokenFetch;
   now?: () => number;
@@ -136,9 +136,13 @@ export class TokenStore {
     const seedHash = sha256(seed);
     if (!stored) return { access_token: "", refresh_token: seed, expires_at: 0, seed_sha256: seedHash };
     if (stored.seed_sha256 === seedHash) return stored;
-    // The file already holds this very token (not yet rotated): keep it, and remember it was seeded so a
-    // later rotation is not overwritten by the now-stale env value on restart.
-    if (stored.refresh_token === seed) return { ...stored, seed_sha256: seedHash };
+    if (stored.seed_sha256 === undefined) {
+      // An unmarked file is a `login` result (or the file already holds this token): it wins over the env
+      // value. Mark it as seeded so a later rotation is not overwritten by the stale env value on restart.
+      const marked = { ...stored, seed_sha256: seedHash };
+      await writeTokens(this.#opts.configDir, marked);
+      return marked;
+    }
     return { access_token: "", refresh_token: seed, expires_at: 0, seed_sha256: seedHash };
   }
 
