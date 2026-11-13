@@ -1,15 +1,19 @@
 export type ParamLocation = "path" | "query";
 export type ParamType = "integer" | "number" | "string" | "boolean" | "array";
 
-export interface ParamDescriptor {
-  name: string;
-  in: ParamLocation;
-  required: boolean;
+export interface ValueSchema {
   type: ParamType;
-  description?: string;
   minimum?: number;
   maximum?: number;
   enum?: (string | number)[];
+  items?: ValueSchema;
+}
+
+export interface ParamDescriptor extends ValueSchema {
+  name: string;
+  in: ParamLocation;
+  required: boolean;
+  description?: string;
 }
 
 export interface OperationDescriptor {
