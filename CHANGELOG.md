@@ -6,18 +6,50 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-11-13
+
+Every Etsy Open API v3 Operation is now a Tool (107, up from 5), with Toolsets, Read-only Mode, automatic OAuth token refresh, a `login` command, file uploads and rate-limit handling. This release has breaking changes; see "Migrating from 0.1.x" below.
+
+### Migrating from 0.1.x
+
+Tools are now named after Etsy's `operationId` in snake_case, so two of the five 0.1.x Tools were renamed (the other three keep their names and gain the full spec input schema):
+
+| 0.1.x Tool | 0.2.0 Tool |
+| --- | --- |
+| `get_shop` | `get_shop` (unchanged) |
+| `find_shops` | `find_shops` (unchanged) |
+| `get_listing` | `get_listing` (unchanged) |
+| `search_listings` | `find_all_listings_active` |
+| `get_shop_listings` | `find_all_active_listings_by_shop` |
+
+Other things to change:
+
+- `ETSY_SHARED_SECRET` is now required alongside `ETSY_API_KEY`; the server exits at startup if either is missing.
+- `ETSY_ACCESS_TOKEN` is removed. If it is still set, a deprecation warning is printed to stderr and the value is ignored. Run `npx @artisanxl/etsy-mcp login` instead (or set `ETSY_REFRESH_TOKEN` for headless use). Access tokens now refresh automatically.
+- Register `http://localhost:3003/callback` as a redirect URI in your Etsy app before running `login` (or the matching port if you set `ETSY_REDIRECT_PORT`).
+- The server starts in Read-only Mode. Set `ETSY_ALLOW_WRITES=true` to offer Write Tools.
+- Non-2xx responses are now Tool errors (`isError: true`) with the HTTP status and body.
+
+### Added
+
+- 107 Tools generated from a committed Etsy Spec Snapshot, named by snake_case `operationId`. Input schemas carry enums, bounds, required/optional and array types from the spec; path, query and body fields form one flat input set. Array query and form-urlencoded values are sent comma-joined, JSON bodies as real JSON (nested objects and arrays supported).
+- Toolsets: every Tool belongs to one of 8 Toolsets (`listings`, `shop`, `shipping`, `orders`, `reviews`, `taxonomy`, `users`, `other`), assigned from the Etsy tag. New `ETSY_TOOLSETS` env var (comma-separated) narrows the offered Tools; unset means all, and an unknown or empty value fails at startup listing the valid names.
+- Read-only Mode and Write Tools: by default only the 64 GET Tools plus `token_scopes` (a POST that changes nothing) are offered. New `ETSY_ALLOW_WRITES=true` also offers the 42 Write Tools (other POST/PUT/PATCH/DELETE Operations). Every Tool carries `readOnlyHint` / `destructiveHint` / `idempotentHint` / `openWorldHint` annotations.
+- `npx @artisanxl/etsy-mcp login [--scopes a,b]`: OAuth 2.0 PKCE (S256) with `state` verification and a one-shot callback on `localhost:3003` (`ETSY_REDIRECT_PORT` to change). Requests every Operation scope unless narrowed, and saves tokens (0600) to `~/.config/etsy-mcp/tokens.json`.
+- OAuth Operations send a Bearer access token; public Operations never load or refresh a token. Access tokens are refreshed shortly before expiry and once on a 401 (concurrent calls share one refresh), and the refreshed pair is persisted. New `ETSY_REFRESH_TOKEN` env var seeds the token file for headless use; a token file without `seed_sha256` (such as a `login` result) wins over it and is then marked as seeded, so a stale env value never overwrites it. A missing token, or a 403, returns an error pointing at `login`.
+- File uploads: `upload_listing_image`, `upload_listing_file` and `upload_listing_video` (Write Tools) take an absolute local file path in their `image` / `file` / `video` field, read it and send multipart with the original filename. The field stays optional where the spec says so; a missing or unreadable path returns a Tool error without any HTTP call.
+- Rate limits: a 429 is retried up to 3 times per Tool call, waiting `Retry-After` (seconds or HTTP date; 1s if absent; a `Retry-After` of at most 60s is waited, a longer one is not retried). A 429 with `x-remaining-today: 0` or a `Retry-After` longer than 60s (daily quota exhausted) is returned immediately with a hint that retrying will not help; exhausted retries also add a hint. Cancelling the MCP request aborts the wait.
+- `npm run gen` downloads the latest Etsy spec into the Spec Snapshot and then runs `gen:local` (offline). A weekly (and manually dispatchable) `spec-refresh` workflow runs it on the upstream repo only and opens a PR when the snapshot or generated output changed; generation fails on an unmapped tag, a missing `operationId` or a duplicate Tool name. CI runs `gen:local` and fails on any diff.
+- Vitest test suite exercising the server through an in-memory MCP client with a fake HTTP layer.
+
 ### Changed
 
-- Tools are now generated from a committed Etsy Spec Snapshot: 64 read Tools named by snake_case `operationId`. **Breaking:** the old hand-written names `find_shops`, `search_listings` and `get_shop_listings` are gone (use `get_listing`-style generated names). Non-2xx responses now return a Tool error (`isError`) with status and body. Input schemas carry enums, bounds, required/optional and array types from the spec; array query params are sent comma-joined.
-- Requests now send `x-api-key` as `keystring:shared_secret`; the new `ETSY_SHARED_SECRET` env var is required alongside `ETSY_API_KEY`, and the server fails at startup if either is missing.
-- Every Tool belongs to one of 8 Toolsets (`listings`, `shop`, `shipping`, `orders`, `reviews`, `taxonomy`, `users`, `other`), assigned from the Etsy tag; generation fails on an unmapped tag. New `ETSY_TOOLSETS` env var (comma-separated) narrows the offered Tools; unset means all, and an unknown or empty value fails at startup listing the valid names.
-- OAuth: Tools whose Operation requires `oauth2` send a Bearer access token read from `~/.config/etsy-mcp/tokens.json` (0600); public Operations never load or refresh a token. Access tokens are refreshed shortly before expiry and once on a 401 (concurrent calls share one refresh) and the refreshed pair is persisted. New `ETSY_REFRESH_TOKEN` env var seeds the token file for headless use. A missing token or a 403 returns an error pointing at `login`. **Breaking:** `ETSY_ACCESS_TOKEN` is removed; setting it logs a deprecation warning to stderr.
-- New `npx @artisanxl/etsy-mcp login [--scopes a,b]` command: OAuth 2.0 PKCE (S256) with `state` verification, one-shot callback on `localhost:3003` (`ETSY_REDIRECT_PORT` to change), requests every Operation scope unless narrowed, and saves tokens (0600) to the token file. A token file without `seed_sha256` (such as a login result) wins over `ETSY_REFRESH_TOKEN` and is then marked as seeded, so a stale env value never overwrites it.
-- Write Tools: POST/PUT/PATCH/DELETE Operations are offered only when `ETSY_ALLOW_WRITES=true`; the default is Read-only Mode, which still offers `token_scopes` (a POST that changes nothing). Body fields join path/query parameters in one flat input set and are sent form-urlencoded (arrays comma-joined) or as JSON (nested objects, real arrays) per the Operation. Every Tool now carries `readOnlyHint` / `destructiveHint` / `idempotentHint` / `openWorldHint` annotations.
-- File uploads: `upload_listing_image`, `upload_listing_file` and `upload_listing_video` (Write Tools) take an absolute local file path in their `image` / `file` / `video` field, read it and send multipart with the original filename. The field stays optional where the spec says so (e.g. `listing_image_id` instead of `image` reads no file); a missing or unreadable path returns a Tool error without any HTTP call.
-- Rate limits: a 429 is retried up to 3 times per Tool call, waiting `Retry-After` (seconds or HTTP date; 1s if absent, capped at 60s). A 429 with `x-remaining-today: 0` or a `Retry-After` longer than 60s (daily quota exhausted) is returned immediately as an error with a hint that retrying will not help; exhausted retries also add a hint. Cancelling the MCP request aborts the wait and stops retrying. Rate-limit retries share one budget per call and do not consume the single 401 refresh.
-- `npm run gen` downloads the latest Etsy spec into the Spec Snapshot and then runs `gen:local`. A weekly (and manually dispatchable) `spec-refresh` workflow runs it on the upstream repo only and opens a PR when the snapshot or generated output changed; generation failures (unmapped tag, missing `operationId`, duplicate Tool name) fail the job instead of opening a PR.
-- Server is built by a testable `createServer` factory; added Vitest tests.
+- Requests now send `x-api-key` as `keystring:shared_secret`, as the current Etsy API requires.
+- The server is built by a testable `createServer` factory, and the reported server version is 0.2.0.
+
+### Removed
+
+- `ETSY_ACCESS_TOKEN` (see migration notes above).
 
 ## [0.1.1] - 2026-11-13
 

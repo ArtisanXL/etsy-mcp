@@ -223,7 +223,7 @@ export function createServer(config: Config, deps: ServerDeps = {}): McpServer {
     fetch: fetchImpl,
     now: deps.now,
   });
-  const server = new McpServer({ name: "etsy-mcp", version: "0.1.1" });
+  const server = new McpServer({ name: "etsy-mcp", version: "0.2.0" });
 
   const enabled = config.toolsets && new Set<string>(config.toolsets);
   const offered = operations.filter((op) => (config.allowWrites || !op.write) && (!enabled || enabled.has(op.toolset)));

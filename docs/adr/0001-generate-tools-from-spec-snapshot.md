@@ -4,5 +4,5 @@ We expose every Etsy Open API v3 Operation as its own Tool, generated at build t
 
 ## Consequences
 
-- Tool names follow `operationId` (snake_case), which broke the five hand-written 0.1.x tool names (released as 0.2.0).
+- Tool names follow `operationId` (snake_case), which renamed two of the five hand-written 0.1.x tools (`search_listings`, `get_shop_listings`); the other three already matched their `operationId` (released as 0.2.0).
 - Tool count is managed with Toolsets and Read-only Mode rather than by merging Operations into fewer Tools.
