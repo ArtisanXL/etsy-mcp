@@ -2,7 +2,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import type { Config } from "./config.js";
 import { operations } from "./generated/operations.js";
-import type { OperationDescriptor, ParamDescriptor } from "./operation.js";
+import type { ParamDescriptor } from "./operation.js";
 
 export type FetchLike = (url: URL, init: { headers: Record<string, string> }) => Promise<Response>;
 
@@ -26,14 +26,10 @@ function paramSchema(p: ParamDescriptor): z.ZodType {
   return p.required ? s : s.optional();
 }
 
-function isReadTool(op: OperationDescriptor): boolean {
-  return op.method === "GET";
-}
-
 export function createServer(config: Config, fetchImpl: FetchLike = fetch): McpServer {
   const server = new McpServer({ name: "etsy-mcp", version: "0.1.1" });
 
-  for (const op of operations.filter(isReadTool)) {
+  for (const op of operations.filter((op) => !op.write)) {
     const params = op.params.filter((p) => p.type !== "array");
     const inputSchema = Object.fromEntries(params.map((p) => [p.name, paramSchema(p)]));
     server.registerTool(
