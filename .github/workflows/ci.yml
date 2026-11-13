@@ -22,6 +22,8 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run typecheck
+      - run: npm run gen:local
+      - run: git diff --exit-code
       - run: npm test
       - run: npm run build
       - run: npm pack --dry-run
