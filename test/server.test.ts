@@ -1,3 +1,5 @@
+import { homedir } from "node:os";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { loadConfig } from "../src/config.js";
 import { operations } from "../src/generated/operations.js";
@@ -54,11 +56,7 @@ describe("tools/call", () => {
     ["get_listing", { listing_id: 7 }, "/v3/application/listings/7"],
     ["get_listing", { listing_id: 7, language: "de" }, "/v3/application/listings/7?language=de"],
     ["find_shops", { shop_name: "x y", limit: 5 }, "/v3/application/shops?shop_name=x+y&limit=5"],
-    [
-      "get_listings_by_shop",
-      { shop_id: 3, limit: 1, offset: 2 },
-      "/v3/application/shops/3/listings?limit=1&offset=2",
-    ],
+    ["find_shops", { shop_name: "a", limit: 1, offset: 2 }, "/v3/application/shops?shop_name=a&limit=1&offset=2"],
   ];
 
   it.each(cases)("%s sends the expected request", async (name, args, pathAndQuery) => {
@@ -80,12 +78,6 @@ describe("tools/call", () => {
     expect(requests).toHaveLength(1);
     expect(requests[0].url.search).toBe("?listing_ids=1%2C2%2C3&includes=Images%2CShop");
     expect(requests[0].url.searchParams.get("listing_ids")).toBe("1,2,3");
-  });
-
-  it("passes ETSY_ACCESS_TOKEN through as a bearer token", async () => {
-    const { client, requests } = await connect({ accessToken: "tok" });
-    await client.callTool({ name: "get_shop", arguments: { shop_id: 1 } });
-    expect(requests[0].headers.Authorization).toBe("Bearer tok");
   });
 
   it("returns a tool error on non-2xx", async () => {
@@ -161,9 +153,22 @@ describe("loadConfig", () => {
     expect(loadConfig({ ETSY_API_KEY: "k", ETSY_SHARED_SECRET: "s" })).toEqual({
       apiKey: "k",
       sharedSecret: "s",
-      accessToken: undefined,
+      refreshToken: undefined,
+      configDir: join(homedir(), ".config", "etsy-mcp"),
       toolsets: undefined,
     });
+  });
+  it("reads ETSY_REFRESH_TOKEN", () => {
+    expect(loadConfig({ ETSY_API_KEY: "k", ETSY_SHARED_SECRET: "s", ETSY_REFRESH_TOKEN: "r" }).refreshToken).toBe("r");
+  });
+  it("warns on stderr when the removed ETSY_ACCESS_TOKEN is set", () => {
+    const warnings: string[] = [];
+    const base = { ETSY_API_KEY: "k", ETSY_SHARED_SECRET: "s" };
+    loadConfig({ ...base, ETSY_ACCESS_TOKEN: "old" }, (m) => warnings.push(m));
+    expect(warnings).toHaveLength(1);
+    expect(warnings[0]).toMatch(/ETSY_ACCESS_TOKEN.*no longer used/);
+    loadConfig(base, (m) => warnings.push(m));
+    expect(warnings).toHaveLength(1);
   });
 
   describe("ETSY_TOOLSETS", () => {
