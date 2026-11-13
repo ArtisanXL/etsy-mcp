@@ -1,5 +1,6 @@
-import { readFile as fsReadFile } from "node:fs/promises";
-import { basename, extname } from "node:path";
+import { openAsBlob } from "node:fs";
+import { stat } from "node:fs/promises";
+import { basename, extname, isAbsolute } from "node:path";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { ToolAnnotations } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
@@ -18,7 +19,7 @@ export type FetchLike = (url: URL, init: FetchInit) => Promise<Response>;
 export interface ServerDeps {
   fetch?: FetchLike;
   now?: () => number;
-  /** Reads a local file for multipart uploads. */
+  /** Overrides how upload files are read (default streams from disk); tests inject it. */
   readFile?: (path: string) => Promise<Uint8Array>;
 }
 
@@ -63,16 +64,14 @@ function propertyShape(props: PropertyDescriptor[]): Record<string, z.ZodType> {
   return Object.fromEntries(props.map((p) => [p.name, propertySchema(p)]));
 }
 
+const FILE_FIELD_HINT = "Absolute local path of the file to upload; the server reads it from disk.";
+
 function paramShape(params: ParamDescriptor[]): Record<string, z.ZodType> {
   return Object.fromEntries(
     params.map((p) => {
       const described =
         p.in === "body-multipart-file"
-          ? {
-              ...p,
-              description:
-                `${p.description ?? ""} Local path of the file to upload; the server reads it from disk.`.trim(),
-            }
+          ? { ...p, description: `${p.description ?? ""} ${FILE_FIELD_HINT}`.trim() }
           : p;
       return [p.name, propertySchema(described, p.in === "query")];
     }),
@@ -108,25 +107,32 @@ const MIME_TYPES: Record<string, string> = {
 
 class UploadError extends Error {}
 
-async function readUpload(readFile: (path: string) => Promise<Uint8Array>, field: string, path: string) {
-  let bytes: Uint8Array;
+type OpenFile = (path: string, type: string) => Promise<Blob>;
+
+const openFromDisk: OpenFile = async (path, type) => {
+  if (!(await stat(path)).isFile()) throw new Error("not a regular file");
+  return openAsBlob(path, { type });
+};
+
+async function readUpload(openFile: OpenFile, field: string, path: string) {
+  if (!isAbsolute(path)) {
+    throw new UploadError(
+      `"${field}" must be an absolute local path, got "${path}". Relative paths and "~" are not expanded.`,
+    );
+  }
+  const type = MIME_TYPES[extname(path).toLowerCase()] ?? "application/octet-stream";
   try {
-    bytes = await readFile(path);
+    return { blob: await openFile(path, type), filename: basename(path) };
   } catch (err) {
     const reason = err instanceof Error ? err.message : String(err);
     throw new UploadError(`Cannot read file for "${field}" at "${path}": ${reason}`);
   }
-  const type = MIME_TYPES[extname(path).toLowerCase()] ?? "application/octet-stream";
-  return {
-    blob: new Blob([bytes as Uint8Array<ArrayBuffer>], { type }),
-    filename: basename(path),
-  };
 }
 
 async function buildRequest(
   op: OperationDescriptor,
   args: Record<string, unknown>,
-  readFile: (path: string) => Promise<Uint8Array>,
+  openFile: OpenFile,
 ) {
   let path = op.path;
   const url = new URL(API_BASE);
@@ -146,17 +152,13 @@ async function buildRequest(
     else if (p.in === "body-json") json[p.name] = v;
     else if (p.in === "body-multipart") multipart.append(p.name, formValue(v));
     else if (p.in === "body-multipart-file") {
-      const { blob, filename } = await readUpload(readFile, p.name, String(v));
+      const { blob, filename } = await readUpload(openFile, p.name, String(v));
       multipart.append(p.name, blob, filename);
     }
   }
   url.pathname = path;
   if (op.params.some((p) => p.in === "body-form")) {
-    return {
-      url,
-      contentType: "application/x-www-form-urlencoded",
-      body: form.toString(),
-    };
+    return { url, contentType: "application/x-www-form-urlencoded", body: form.toString() };
   }
   if (op.params.some((p) => p.in === "body-json")) {
     return { url, contentType: "application/json", body: JSON.stringify(json) };
@@ -174,7 +176,10 @@ function errorResult(text: string) {
 
 export function createServer(config: Config, deps: ServerDeps = {}): McpServer {
   const fetchImpl = deps.fetch ?? fetch;
-  const readFile = deps.readFile ?? fsReadFile;
+  const { readFile } = deps;
+  const openFile: OpenFile = readFile
+    ? async (path, type) => new Blob([(await readFile(path)) as Uint8Array<ArrayBuffer>], { type })
+    : openFromDisk;
   const tokens = new TokenStore({
     configDir: config.configDir,
     apiKey: config.apiKey,
@@ -189,31 +194,21 @@ export function createServer(config: Config, deps: ServerDeps = {}): McpServer {
   for (const op of offered) {
     server.registerTool(
       op.toolName,
-      {
-        description: op.description,
-        inputSchema: paramShape(op.params),
-        annotations: toolAnnotations(op),
-      },
+      { description: op.description, inputSchema: paramShape(op.params), annotations: toolAnnotations(op) },
       async (args: Record<string, unknown>) => {
         let built: Awaited<ReturnType<typeof buildRequest>>;
         try {
-          built = await buildRequest(op, args, readFile);
+          built = await buildRequest(op, args, openFile);
         } catch (err) {
           if (err instanceof UploadError) return errorResult(err.message);
           throw err;
         }
         const { url, contentType, body: requestBody } = built;
         const send = (bearer?: string) => {
-          const headers: Record<string, string> = {
-            "x-api-key": `${config.apiKey}:${config.sharedSecret}`,
-          };
+          const headers: Record<string, string> = { "x-api-key": `${config.apiKey}:${config.sharedSecret}` };
           if (bearer) headers.Authorization = `Bearer ${bearer}`;
           if (contentType) headers["Content-Type"] = contentType;
-          return fetchImpl(url, {
-            method: op.method,
-            headers,
-            body: requestBody,
-          });
+          return fetchImpl(url, { method: op.method, headers, body: requestBody });
         };
         const needsOAuth = op.oauth2;
         let res: Response;

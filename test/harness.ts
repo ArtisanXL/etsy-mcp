@@ -33,7 +33,11 @@ export async function connect(
     {
       ...deps,
       fetch: async (url, init) => {
-        const req = { method: init.method ?? "GET", url, headers: init.headers, body: typeof init.body === "string" ? init.body : undefined,
+        const req = {
+          method: init.method ?? "GET",
+          url,
+          headers: init.headers,
+          body: typeof init.body === "string" ? init.body : undefined,
           form: init.body instanceof FormData ? init.body : undefined,
         };
         requests.push(req);

@@ -162,11 +162,30 @@ describe("file uploads from local paths", () => {
     expect(requests).toHaveLength(0);
   });
 
-  it("describes the file field as a local path", async () => {
+  it.each(["relative/pic.jpg", "pic.jpg", "./pic.jpg", "~/pic.jpg"])(
+    "rejects the non-absolute path %s with a clear error and no HTTP call",
+    async (image) => {
+      const read: string[] = [];
+      const { client, requests } = await writing(async (p) => {
+        read.push(p);
+        return new Uint8Array();
+      });
+      const res = await client.callTool({
+        name: "upload_listing_image",
+        arguments: { shop_id: 1, listing_id: 2, image },
+      });
+      expect(res.isError).toBe(true);
+      expect(JSON.stringify(res.content)).toMatch(/absolute local path/);
+      expect(read).toEqual([]);
+      expect(requests).toHaveLength(0);
+    },
+  );
+
+  it("describes the file field as an absolute local path", async () => {
     const { client } = await writing();
     const tool = (await client.listTools()).tools.find((t) => t.name === "upload_listing_image")!;
     const props = tool.inputSchema.properties as Record<string, { description?: string }>;
-    expect(props.image.description).toMatch(/local path/i);
+    expect(props.image.description).toMatch(/absolute local path/i);
     expect(tool.inputSchema.required).not.toContain("image");
   });
 
@@ -184,7 +203,8 @@ describe("file uploads from local paths", () => {
     const dir = authedConfigDir();
     const { client, requests } = await connect(
       { allowWrites: true, configDir: dir },
-      (req) => {
+      async (req) => {
+        if (req.form) await new Response(req.form).arrayBuffer();
         if (req.url.pathname.endsWith("/token")) {
           return new Response(JSON.stringify({ access_token: "new", refresh_token: "r2", expires_in: 3600 }));
         }

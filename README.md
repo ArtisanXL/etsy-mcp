@@ -39,11 +39,11 @@ Every Tool belongs to exactly one Toolset: `listings`, `shop`, `shipping`, `orde
 
 ### File uploads
 
-`upload_listing_image` (`image`), `upload_listing_file` (`file`) and `upload_listing_video` (`video`) take a **local file path** in that field. The server reads the file and sends it as multipart with the original filename. The field stays optional where the Etsy spec says so (e.g. `upload_listing_image` with only `listing_image_id` reads no file). A missing or unreadable path returns a Tool error and no request is sent to Etsy. These are Write Tools, so they need `ETSY_ALLOW_WRITES=true`.
+`upload_listing_image` (`image`), `upload_listing_file` (`file`) and `upload_listing_video` (`video`) take an **absolute local file path** in that field (relative paths and `~` are rejected). The server reads the file and sends it as multipart with the original filename. The field stays optional where the Etsy spec says so (e.g. `upload_listing_image` with only `listing_image_id` reads no file). A missing or unreadable path returns a Tool error and no request is sent to Etsy. These are Write Tools, so they need `ETSY_ALLOW_WRITES=true`. **Security:** with writes enabled the agent can upload any file the server process can read (for example `~/.config/etsy-mcp/tokens.json`), so only enable writes for agents you trust with that access.
 
 ### Read-only Mode and Write Tools
 
-By default the server is in Read-only Mode: only the 64 GET Tools plus `token_scopes` (a POST that changes nothing) are offered. Set `ETSY_ALLOW_WRITES=true` to also offer Write Tools (every other POST, PUT, PATCH and DELETE Operation). Any value other than `true`/`false` fails at startup.
+By default the server is in Read-only Mode: only the 64 GET Tools plus `token_scopes` (a POST that changes nothing) are offered. Set `ETSY_ALLOW_WRITES=true` to also offer Write Tools (every other POST, PUT, PATCH and DELETE Operation). Any value other than `true`/`false` fails at startup. Note that with writes enabled the upload Tools let the agent upload any file the server process can read.
 
 Every Tool carries MCP annotations: `openWorldHint: true` on all; `readOnlyHint: true` on GETs and `token_scopes`; for Write Tools `readOnlyHint: false`, `destructiveHint: true` only for DELETE, and `idempotentHint: true` for PUT and DELETE.
 
