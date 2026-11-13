@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { generateOperations, TAG_TOOLSETS, toToolName } from "../src/generator.js";
+import { generateOperations, READ_ONLY_OVERRIDES, TAG_TOOLSETS, toToolName } from "../src/generator.js";
 
 const TAGS = ["Other"];
 const spec = (paths: unknown) => ({ paths });
@@ -112,10 +112,148 @@ describe("schema fidelity", () => {
     ).toEqual({ type: "string", enum: ["A", "B"] });
   });
 
+  it("keeps the nullable flag on parameters, array items and object properties", () => {
+    expect(param({ name: "x", in: "query", schema: { type: "boolean", nullable: true } }).nullable).toBe(true);
+    expect(param({ name: "x", in: "query", schema: { type: "boolean" } }).nullable).toBeUndefined();
+    const p = param({
+      name: "o",
+      in: "query",
+      schema: { type: "array", items: { type: "object", properties: { a: { type: "string", nullable: true } } } },
+    });
+    expect(p.items?.properties).toEqual([{ name: "a", required: false, type: "string", nullable: true }]);
+  });
+
   it("treats nullable parameters as not required", () => {
     expect(
       param({ name: "x", in: "query", required: true, schema: { type: "boolean", nullable: true } }).required,
     ).toBe(false);
+  });
+});
+
+describe("request bodies", () => {
+  const withBody = (content: unknown, parameters: unknown[] = []) =>
+    generateOperations(
+      spec({
+        "/a/{id}": {
+          post: { operationId: "postA", tags: TAGS, parameters, requestBody: { content } },
+        },
+      }),
+    )[0];
+  const id = { name: "id", in: "path", required: true, schema: { type: "integer" } };
+
+  it("flattens form-encoded body fields after path/query params with their location", () => {
+    const op = withBody(
+      {
+        "application/x-www-form-urlencoded": {
+          schema: {
+            type: "object",
+            required: ["title", "gone"],
+            properties: {
+              title: { type: "string", description: "T" },
+              gone: { type: "integer", nullable: true },
+              tags: { type: "array", items: { type: "string" } },
+            },
+          },
+        },
+      },
+      [id],
+    );
+    expect(op.params).toEqual([
+      { name: "id", in: "path", required: true, type: "integer" },
+      { name: "title", in: "body-form", required: true, type: "string", description: "T" },
+      { name: "gone", in: "body-form", required: false, type: "integer", nullable: true },
+      { name: "tags", in: "body-form", required: false, type: "array", items: { type: "string" } },
+    ]);
+  });
+
+  it("keeps nested objects and arrays of objects for JSON bodies, resolving $refs", () => {
+    const op = generateOperations({
+      components: { schemas: { Item: { type: "object", required: ["n"], properties: { n: { type: "integer", minimum: 1 } } } } },
+      paths: {
+        "/a": {
+          put: {
+            operationId: "putA",
+            tags: TAGS,
+            requestBody: {
+              content: {
+                "application/json": {
+                  schema: {
+                    type: "object",
+                    required: ["items"],
+                    properties: { items: { type: "array", items: { $ref: "#/components/schemas/Item" } } },
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+    })[0];
+    expect(op.params).toEqual([
+      {
+        name: "items",
+        in: "body-json",
+        required: true,
+        type: "array",
+        items: { type: "object", properties: [{ name: "n", required: true, type: "integer", minimum: 1 }] },
+      },
+    ]);
+  });
+
+  it("marks multipart fields, with binary ones as files", () => {
+    const op = withBody({
+      "multipart/form-data": {
+        schema: {
+          type: "object",
+          properties: { image: { type: "string", format: "binary", nullable: true }, rank: { type: "integer" } },
+        },
+      },
+    });
+    expect(op.params.map((p) => [p.name, p.in])).toEqual([
+      ["image", "body-multipart-file"],
+      ["rank", "body-multipart"],
+    ]);
+  });
+
+  it("fails when a body field collides with a path or query parameter", () => {
+    expect(() =>
+      withBody({ "application/json": { schema: { type: "object", properties: { id: { type: "integer" } } } } }, [id]),
+    ).toThrow(/Body field "id" collides/);
+  });
+
+  it("fails on an unsupported content type", () => {
+    expect(() => withBody({ "text/plain": { schema: { type: "object" } } })).toThrow(/Unsupported request body/);
+  });
+
+  it("fails on nested objects in a form-encoded body", () => {
+    expect(() =>
+      withBody({
+        "application/x-www-form-urlencoded": {
+          schema: { type: "object", properties: { o: { type: "object", properties: { a: { type: "string" } } } } },
+        },
+      }),
+    ).toThrow(/Form-encoded body field "o"/);
+  });
+});
+
+describe("Write Tool flag", () => {
+  const op = (method: string, operationId: string) =>
+    generateOperations(spec({ "/a": { [method]: { operationId, tags: TAGS } } }))[0];
+
+  it.each(["post", "put", "patch", "delete"])("flags %s as a Write Tool", (m) => {
+    expect(op(m, "doA").write).toBe(true);
+  });
+
+  it("exempts the read-only override list, initially only tokenScopes", () => {
+    expect([...READ_ONLY_OVERRIDES]).toEqual(["tokenScopes"]);
+    expect(op("post", "tokenScopes").write).toBe(false);
+  });
+
+  it("makes exactly the 64 GETs plus tokenScopes read-only in the Spec Snapshot", () => {
+    const snapshot = JSON.parse(readFileSync(new URL("../spec/etsy-openapi.json", import.meta.url), "utf8"));
+    const ops = generateOperations(snapshot);
+    expect(ops.filter((o) => !o.write)).toHaveLength(65);
+    expect(ops.filter((o) => !o.write && o.method !== "GET").map((o) => o.toolName)).toEqual(["token_scopes"]);
   });
 });
 
