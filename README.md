@@ -81,7 +81,7 @@ Every Tool carries MCP annotations: `openWorldHint: true` on all; `readOnlyHint:
 
 ### Rate limits
 
-A 429 response is retried up to 3 times per Tool call, waiting the `Retry-After` value (default 1s if absent, capped at 60s); after that the 429 is returned as a Tool error. A 429 is treated as daily-quota exhaustion and returned immediately without retrying when it carries `x-remaining-today: 0` or a `Retry-After` longer than 60s; the error then says retrying will not help. Cancelling the MCP request aborts the wait and stops retrying.
+A 429 response is retried up to 3 times per Tool call, waiting the `Retry-After` value (default 1s if absent; a `Retry-After` of at most 60s is waited, a longer one is not retried, see below); after that the 429 is returned as a Tool error. A 429 is treated as daily-quota exhaustion and returned immediately without retrying when it carries `x-remaining-today: 0` or a `Retry-After` longer than 60s; the error then says retrying will not help. Cancelling the MCP request aborts the wait and stops retrying.
 
 ## Authentication
 

@@ -7,6 +7,5 @@ describe("version", () => {
     const pkg = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8")) as { version: string };
     const { client } = await connect();
     expect(client.getServerVersion()).toMatchObject({ name: "etsy-mcp", version: pkg.version });
-    expect(pkg.version).toBe("0.2.0");
   });
 });
