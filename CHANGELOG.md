@@ -6,6 +6,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [0.1.1] - 2026-11-13
+
+### Changed
+
+- First public npm release (0.1.0 was never published to npm).
+
 ## [0.1.0] - 2026-11-13
 
 ### Added

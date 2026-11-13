@@ -1,6 +1,6 @@
 {
   "name": "@artisanxl/etsy-mcp",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Model Context Protocol (MCP) server for the Etsy Open API v3",
   "type": "module",
   "bin": {

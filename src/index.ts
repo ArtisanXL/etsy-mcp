@@ -23,7 +23,7 @@ async function etsy(path: string, params?: Record<string, string | number | unde
 
 const text = (t: string) => ({ content: [{ type: "text" as const, text: t }] });
 
-const server = new McpServer({ name: "etsy-mcp", version: "0.1.0" });
+const server = new McpServer({ name: "etsy-mcp", version: "0.1.1" });
 
 server.registerTool(
   "get_shop",
