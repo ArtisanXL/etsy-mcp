@@ -36,7 +36,8 @@ function paramSchema(p: ParamDescriptor): z.ZodType {
 export function createServer(config: Config, fetchImpl: FetchLike = fetch): McpServer {
   const server = new McpServer({ name: "etsy-mcp", version: "0.1.1" });
 
-  for (const op of operations.filter((op) => !op.write)) {
+  const enabled = config.toolsets && new Set<string>(config.toolsets);
+  for (const op of operations.filter((op) => !op.write && (!enabled || enabled.has(op.toolset)))) {
     const inputSchema = Object.fromEntries(op.params.map((p) => [p.name, paramSchema(p)]));
     server.registerTool(
       op.toolName,

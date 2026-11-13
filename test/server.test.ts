@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { loadConfig } from "../src/config.js";
+import { operations } from "../src/generated/operations.js";
+import type { Toolset } from "../src/operation.js";
 import { valueSchema } from "../src/server.js";
 import { connect } from "./harness.js";
 
@@ -15,6 +17,35 @@ describe("tools/list", () => {
     expect(tools.find((t) => t.name === "get_listing")?.description).toContain(
       "Retrieves a listing record by listing ID",
     );
+  });
+});
+
+describe("ETSY_TOOLSETS", () => {
+  const toolsetOf = new Map(operations.map((op) => [op.toolName, op.toolset]));
+  const listedToolsets = async (toolsets?: Toolset[]) => {
+    const { client } = await connect({ toolsets });
+    const { tools } = await client.listTools();
+    return { names: tools.map((t) => t.name), sets: new Set(tools.map((t) => toolsetOf.get(t.name))) };
+  };
+
+  it("offers every read Tool when unset", async () => {
+    expect((await listedToolsets()).names).toHaveLength(64);
+  });
+
+  it("offers only Tools from the selected Toolsets", async () => {
+    const { names } = await listedToolsets(["listings", "orders"]);
+    const expected = operations
+      .filter((op) => !op.write && (op.toolset === "listings" || op.toolset === "orders"))
+      .map((op) => op.toolName)
+      .sort();
+    expect(expected.length).toBeGreaterThan(0);
+    expect([...names].sort()).toEqual(expected);
+  });
+
+  it("a single Toolset narrows further", async () => {
+    const { names, sets } = await listedToolsets(["reviews"]);
+    expect(sets).toEqual(new Set(["reviews"]));
+    expect(names).not.toContain("get_listing");
   });
 });
 
@@ -131,6 +162,33 @@ describe("loadConfig", () => {
       apiKey: "k",
       sharedSecret: "s",
       accessToken: undefined,
+      toolsets: undefined,
+    });
+  });
+
+  describe("ETSY_TOOLSETS", () => {
+    const base = { ETSY_API_KEY: "k", ETSY_SHARED_SECRET: "s" };
+    const valid = "listings, shop, shipping, orders, reviews, taxonomy, users, other";
+
+    it("parses a comma-separated list, trimming and deduplicating", () => {
+      expect(loadConfig({ ...base, ETSY_TOOLSETS: "listings, orders,listings" }).toolsets).toEqual([
+        "listings",
+        "orders",
+      ]);
+    });
+
+    it("means all Toolsets when unset", () => {
+      expect(loadConfig(base).toolsets).toBeUndefined();
+    });
+
+    it("fails on an unknown name, listing the valid Toolsets", () => {
+      expect(() => loadConfig({ ...base, ETSY_TOOLSETS: "listings,ordres" })).toThrow(
+        new RegExp(`"ordres".*Valid Toolsets: ${valid}`),
+      );
+    });
+
+    it.each(["", " ", ",", "listings,"])("fails on empty value %j, listing the valid Toolsets", (v) => {
+      expect(() => loadConfig({ ...base, ETSY_TOOLSETS: v })).toThrow(new RegExp(`Valid Toolsets: ${valid}`));
     });
   });
 });

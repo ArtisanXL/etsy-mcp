@@ -12,7 +12,7 @@ export const operations: OperationDescriptor[] = [
       "shops_w"
     ],
     "write": true,
-    "toolset": "all",
+    "toolset": "shop",
     "params": [
       {
         "name": "shop_id",
@@ -34,7 +34,7 @@ export const operations: OperationDescriptor[] = [
       "listings_w"
     ],
     "write": true,
-    "toolset": "all",
+    "toolset": "listings",
     "params": [
       {
         "name": "shop_id",
@@ -56,7 +56,7 @@ export const operations: OperationDescriptor[] = [
       "listings_w"
     ],
     "write": true,
-    "toolset": "all",
+    "toolset": "listings",
     "params": [
       {
         "name": "shop_id",
@@ -93,7 +93,7 @@ export const operations: OperationDescriptor[] = [
       "transactions_w"
     ],
     "write": true,
-    "toolset": "all",
+    "toolset": "orders",
     "params": [
       {
         "name": "shop_id",
@@ -130,7 +130,7 @@ export const operations: OperationDescriptor[] = [
       "listings_w"
     ],
     "write": true,
-    "toolset": "all",
+    "toolset": "shop",
     "params": [
       {
         "name": "shop_id",
@@ -152,7 +152,7 @@ export const operations: OperationDescriptor[] = [
       "shops_w"
     ],
     "write": true,
-    "toolset": "all",
+    "toolset": "shipping",
     "params": [
       {
         "name": "shop_id",
@@ -174,7 +174,7 @@ export const operations: OperationDescriptor[] = [
       "shops_w"
     ],
     "write": true,
-    "toolset": "all",
+    "toolset": "shop",
     "params": [
       {
         "name": "shop_id",
@@ -196,7 +196,7 @@ export const operations: OperationDescriptor[] = [
       "shops_w"
     ],
     "write": true,
-    "toolset": "all",
+    "toolset": "shop",
     "params": [
       {
         "name": "shop_id",
@@ -218,7 +218,7 @@ export const operations: OperationDescriptor[] = [
       "shops_w"
     ],
     "write": true,
-    "toolset": "all",
+    "toolset": "shipping",
     "params": [
       {
         "name": "shop_id",
@@ -240,7 +240,7 @@ export const operations: OperationDescriptor[] = [
       "shops_w"
     ],
     "write": true,
-    "toolset": "all",
+    "toolset": "shipping",
     "params": [
       {
         "name": "shop_id",
@@ -270,7 +270,7 @@ export const operations: OperationDescriptor[] = [
       "shops_w"
     ],
     "write": true,
-    "toolset": "all",
+    "toolset": "shipping",
     "params": [
       {
         "name": "shop_id",
@@ -300,7 +300,7 @@ export const operations: OperationDescriptor[] = [
       "listings_d"
     ],
     "write": true,
-    "toolset": "all",
+    "toolset": "listings",
     "params": [
       {
         "name": "listing_id",
@@ -322,7 +322,7 @@ export const operations: OperationDescriptor[] = [
       "listings_w"
     ],
     "write": true,
-    "toolset": "all",
+    "toolset": "listings",
     "params": [
       {
         "name": "shop_id",
@@ -360,7 +360,7 @@ export const operations: OperationDescriptor[] = [
       "listings_w"
     ],
     "write": true,
-    "toolset": "all",
+    "toolset": "listings",
     "params": [
       {
         "name": "shop_id",
@@ -398,7 +398,7 @@ export const operations: OperationDescriptor[] = [
       "listings_w"
     ],
     "write": true,
-    "toolset": "all",
+    "toolset": "listings",
     "params": [
       {
         "name": "shop_id",
@@ -428,7 +428,7 @@ export const operations: OperationDescriptor[] = [
       "listings_w"
     ],
     "write": true,
-    "toolset": "all",
+    "toolset": "listings",
     "params": [
       {
         "name": "shop_id",
@@ -466,7 +466,7 @@ export const operations: OperationDescriptor[] = [
       "listings_w"
     ],
     "write": true,
-    "toolset": "all",
+    "toolset": "listings",
     "params": [
       {
         "name": "shop_id",
@@ -504,7 +504,7 @@ export const operations: OperationDescriptor[] = [
       "shops_w"
     ],
     "write": true,
-    "toolset": "all",
+    "toolset": "shipping",
     "params": [
       {
         "name": "shop_id",
@@ -534,7 +534,7 @@ export const operations: OperationDescriptor[] = [
       "shops_w"
     ],
     "write": true,
-    "toolset": "all",
+    "toolset": "shop",
     "params": [
       {
         "name": "shop_id",
@@ -564,7 +564,7 @@ export const operations: OperationDescriptor[] = [
       "shops_w"
     ],
     "write": true,
-    "toolset": "all",
+    "toolset": "shop",
     "params": [
       {
         "name": "shop_id",
@@ -594,7 +594,7 @@ export const operations: OperationDescriptor[] = [
       "shops_w"
     ],
     "write": true,
-    "toolset": "all",
+    "toolset": "shipping",
     "params": [
       {
         "name": "shop_id",
@@ -624,7 +624,7 @@ export const operations: OperationDescriptor[] = [
       "shops_w"
     ],
     "write": true,
-    "toolset": "all",
+    "toolset": "shipping",
     "params": [
       {
         "name": "shop_id",
@@ -662,7 +662,7 @@ export const operations: OperationDescriptor[] = [
       "shops_w"
     ],
     "write": true,
-    "toolset": "all",
+    "toolset": "shipping",
     "params": [
       {
         "name": "shop_id",
@@ -698,7 +698,7 @@ export const operations: OperationDescriptor[] = [
     "path": "/v3/application/shops/{shop_id}/listings/active",
     "scopes": [],
     "write": false,
-    "toolset": "all",
+    "toolset": "listings",
     "params": [
       {
         "name": "shop_id",
@@ -770,7 +770,7 @@ export const operations: OperationDescriptor[] = [
     "path": "/v3/application/listings/active",
     "scopes": [],
     "write": false,
-    "toolset": "all",
+    "toolset": "listings",
     "params": [
       {
         "name": "limit",
@@ -884,7 +884,7 @@ export const operations: OperationDescriptor[] = [
     "path": "/v3/application/shops",
     "scopes": [],
     "write": false,
-    "toolset": "all",
+    "toolset": "shop",
     "params": [
       {
         "name": "shop_name",
@@ -922,7 +922,7 @@ export const operations: OperationDescriptor[] = [
       "listings_r"
     ],
     "write": false,
-    "toolset": "all",
+    "toolset": "listings",
     "params": [
       {
         "name": "listing_id",
@@ -950,7 +950,7 @@ export const operations: OperationDescriptor[] = [
     "path": "/v3/application/buyer-taxonomy/nodes",
     "scopes": [],
     "write": false,
-    "toolset": "all",
+    "toolset": "taxonomy",
     "params": []
   },
   {
@@ -961,7 +961,7 @@ export const operations: OperationDescriptor[] = [
     "path": "/v3/application/shops/{shop_id}/listings/featured",
     "scopes": [],
     "write": false,
-    "toolset": "all",
+    "toolset": "listings",
     "params": [
       {
         "name": "shop_id",
@@ -1007,7 +1007,7 @@ export const operations: OperationDescriptor[] = [
       "shops_r"
     ],
     "write": false,
-    "toolset": "all",
+    "toolset": "shipping",
     "params": [
       {
         "name": "shop_id",
@@ -1027,7 +1027,7 @@ export const operations: OperationDescriptor[] = [
     "path": "/v3/application/listings/{listing_id}",
     "scopes": [],
     "write": false,
-    "toolset": "all",
+    "toolset": "listings",
     "params": [
       {
         "name": "listing_id",
@@ -1082,7 +1082,7 @@ export const operations: OperationDescriptor[] = [
       "listings_r"
     ],
     "write": false,
-    "toolset": "all",
+    "toolset": "listings",
     "params": [
       {
         "name": "shop_id",
@@ -1118,7 +1118,7 @@ export const operations: OperationDescriptor[] = [
     "path": "/v3/application/listings/{listing_id}/images/{listing_image_id}",
     "scopes": [],
     "write": false,
-    "toolset": "all",
+    "toolset": "listings",
     "params": [
       {
         "name": "listing_id",
@@ -1146,7 +1146,7 @@ export const operations: OperationDescriptor[] = [
     "path": "/v3/application/listings/{listing_id}/images",
     "scopes": [],
     "write": false,
-    "toolset": "all",
+    "toolset": "listings",
     "params": [
       {
         "name": "listing_id",
@@ -1168,7 +1168,7 @@ export const operations: OperationDescriptor[] = [
       "listings_r"
     ],
     "write": false,
-    "toolset": "all",
+    "toolset": "listings",
     "params": [
       {
         "name": "listing_id",
@@ -1205,7 +1205,7 @@ export const operations: OperationDescriptor[] = [
     "path": "/v3/application/listings/{listing_id}/personalization",
     "scopes": [],
     "write": false,
-    "toolset": "all",
+    "toolset": "listings",
     "params": [
       {
         "name": "listing_id",
@@ -1227,7 +1227,7 @@ export const operations: OperationDescriptor[] = [
       "listings_r"
     ],
     "write": false,
-    "toolset": "all",
+    "toolset": "listings",
     "params": [
       {
         "name": "listing_id",
@@ -1262,7 +1262,7 @@ export const operations: OperationDescriptor[] = [
     "path": "/v3/application/shops/{shop_id}/listings/{listing_id}/properties",
     "scopes": [],
     "write": false,
-    "toolset": "all",
+    "toolset": "listings",
     "params": [
       {
         "name": "shop_id",
@@ -1290,7 +1290,7 @@ export const operations: OperationDescriptor[] = [
     "path": "/v3/application/listings/{listing_id}/properties/{property_id}",
     "scopes": [],
     "write": false,
-    "toolset": "all",
+    "toolset": "listings",
     "params": [
       {
         "name": "listing_id",
@@ -1318,7 +1318,7 @@ export const operations: OperationDescriptor[] = [
     "path": "/v3/application/shops/{shop_id}/listings/{listing_id}/translations/{language}",
     "scopes": [],
     "write": false,
-    "toolset": "all",
+    "toolset": "listings",
     "params": [
       {
         "name": "shop_id",
@@ -1353,7 +1353,7 @@ export const operations: OperationDescriptor[] = [
     "path": "/v3/application/shops/{shop_id}/listings/{listing_id}/variation-images",
     "scopes": [],
     "write": false,
-    "toolset": "all",
+    "toolset": "listings",
     "params": [
       {
         "name": "shop_id",
@@ -1381,7 +1381,7 @@ export const operations: OperationDescriptor[] = [
     "path": "/v3/application/listings/{listing_id}/videos/{video_id}",
     "scopes": [],
     "write": false,
-    "toolset": "all",
+    "toolset": "listings",
     "params": [
       {
         "name": "video_id",
@@ -1409,7 +1409,7 @@ export const operations: OperationDescriptor[] = [
     "path": "/v3/application/listings/{listing_id}/videos",
     "scopes": [],
     "write": false,
-    "toolset": "all",
+    "toolset": "listings",
     "params": [
       {
         "name": "listing_id",
@@ -1429,7 +1429,7 @@ export const operations: OperationDescriptor[] = [
     "path": "/v3/application/listings/batch",
     "scopes": [],
     "write": false,
-    "toolset": "all",
+    "toolset": "listings",
     "params": [
       {
         "name": "listing_ids",
@@ -1494,7 +1494,7 @@ export const operations: OperationDescriptor[] = [
       "listings_r"
     ],
     "write": false,
-    "toolset": "all",
+    "toolset": "listings",
     "params": [
       {
         "name": "shop_id",
@@ -1597,7 +1597,7 @@ export const operations: OperationDescriptor[] = [
       "transactions_r"
     ],
     "write": false,
-    "toolset": "all",
+    "toolset": "listings",
     "params": [
       {
         "name": "receipt_id",
@@ -1651,7 +1651,7 @@ export const operations: OperationDescriptor[] = [
       "listings_r"
     ],
     "write": false,
-    "toolset": "all",
+    "toolset": "listings",
     "params": [
       {
         "name": "return_policy_id",
@@ -1686,7 +1686,7 @@ export const operations: OperationDescriptor[] = [
     "path": "/v3/application/shops/{shop_id}/shop-sections/listings",
     "scopes": [],
     "write": false,
-    "toolset": "all",
+    "toolset": "listings",
     "params": [
       {
         "name": "shop_id",
@@ -1771,7 +1771,7 @@ export const operations: OperationDescriptor[] = [
       "listings_r"
     ],
     "write": false,
-    "toolset": "all",
+    "toolset": "listings",
     "params": [
       {
         "name": "listing_ids",
@@ -1796,7 +1796,7 @@ export const operations: OperationDescriptor[] = [
       "shops_r"
     ],
     "write": false,
-    "toolset": "all",
+    "toolset": "listings",
     "params": [
       {
         "name": "listing_ids",
@@ -1821,7 +1821,7 @@ export const operations: OperationDescriptor[] = [
       "shops_r"
     ],
     "write": false,
-    "toolset": "all",
+    "toolset": "users",
     "params": []
   },
   {
@@ -1834,7 +1834,7 @@ export const operations: OperationDescriptor[] = [
       "transactions_r"
     ],
     "write": false,
-    "toolset": "all",
+    "toolset": "orders",
     "params": [
       {
         "name": "shop_id",
@@ -1866,7 +1866,7 @@ export const operations: OperationDescriptor[] = [
       "transactions_r"
     ],
     "write": false,
-    "toolset": "all",
+    "toolset": "orders",
     "params": [
       {
         "name": "shop_id",
@@ -1897,7 +1897,7 @@ export const operations: OperationDescriptor[] = [
     "path": "/v3/application/buyer-taxonomy/nodes/{taxonomy_id}/properties",
     "scopes": [],
     "write": false,
-    "toolset": "all",
+    "toolset": "taxonomy",
     "params": [
       {
         "name": "taxonomy_id",
@@ -1917,7 +1917,7 @@ export const operations: OperationDescriptor[] = [
     "path": "/v3/application/seller-taxonomy/nodes/{taxonomy_id}/properties",
     "scopes": [],
     "write": false,
-    "toolset": "all",
+    "toolset": "taxonomy",
     "params": [
       {
         "name": "taxonomy_id",
@@ -1951,7 +1951,7 @@ export const operations: OperationDescriptor[] = [
     "path": "/v3/application/listings/{listing_id}/reviews",
     "scopes": [],
     "write": false,
-    "toolset": "all",
+    "toolset": "reviews",
     "params": [
       {
         "name": "listing_id",
@@ -2004,7 +2004,7 @@ export const operations: OperationDescriptor[] = [
     "path": "/v3/application/shops/{shop_id}/reviews",
     "scopes": [],
     "write": false,
-    "toolset": "all",
+    "toolset": "reviews",
     "params": [
       {
         "name": "shop_id",
@@ -2057,7 +2057,7 @@ export const operations: OperationDescriptor[] = [
     "path": "/v3/application/seller-taxonomy/nodes",
     "scopes": [],
     "write": false,
-    "toolset": "all",
+    "toolset": "taxonomy",
     "params": []
   },
   {
@@ -2068,7 +2068,7 @@ export const operations: OperationDescriptor[] = [
     "path": "/v3/application/shipping-carriers",
     "scopes": [],
     "write": false,
-    "toolset": "all",
+    "toolset": "shipping",
     "params": [
       {
         "name": "origin_country_iso",
@@ -2087,7 +2087,7 @@ export const operations: OperationDescriptor[] = [
     "path": "/v3/application/shops/{shop_id}",
     "scopes": [],
     "write": false,
-    "toolset": "all",
+    "toolset": "shop",
     "params": [
       {
         "name": "shop_id",
@@ -2107,7 +2107,7 @@ export const operations: OperationDescriptor[] = [
     "path": "/v3/application/users/{user_id}/shops",
     "scopes": [],
     "write": false,
-    "toolset": "all",
+    "toolset": "shop",
     "params": [
       {
         "name": "user_id",
@@ -2129,7 +2129,7 @@ export const operations: OperationDescriptor[] = [
       "listings_r"
     ],
     "write": false,
-    "toolset": "all",
+    "toolset": "shop",
     "params": [
       {
         "name": "shop_id",
@@ -2159,7 +2159,7 @@ export const operations: OperationDescriptor[] = [
       "listings_r"
     ],
     "write": false,
-    "toolset": "all",
+    "toolset": "shop",
     "params": [
       {
         "name": "shop_id",
@@ -2181,7 +2181,7 @@ export const operations: OperationDescriptor[] = [
       "transactions_r"
     ],
     "write": false,
-    "toolset": "all",
+    "toolset": "orders",
     "params": [
       {
         "name": "shop_id",
@@ -2236,7 +2236,7 @@ export const operations: OperationDescriptor[] = [
       "transactions_r"
     ],
     "write": false,
-    "toolset": "all",
+    "toolset": "orders",
     "params": [
       {
         "name": "shop_id",
@@ -2266,7 +2266,7 @@ export const operations: OperationDescriptor[] = [
       "transactions_r"
     ],
     "write": false,
-    "toolset": "all",
+    "toolset": "orders",
     "params": [
       {
         "name": "shop_id",
@@ -2296,7 +2296,7 @@ export const operations: OperationDescriptor[] = [
       "shops_r"
     ],
     "write": false,
-    "toolset": "all",
+    "toolset": "shop",
     "params": [
       {
         "name": "shop_id",
@@ -2318,7 +2318,7 @@ export const operations: OperationDescriptor[] = [
       "shops_r"
     ],
     "write": false,
-    "toolset": "all",
+    "toolset": "shipping",
     "params": [
       {
         "name": "shop_id",
@@ -2348,7 +2348,7 @@ export const operations: OperationDescriptor[] = [
       "shops_r"
     ],
     "write": false,
-    "toolset": "all",
+    "toolset": "shipping",
     "params": [
       {
         "name": "shop_id",
@@ -2387,7 +2387,7 @@ export const operations: OperationDescriptor[] = [
       "transactions_r"
     ],
     "write": false,
-    "toolset": "all",
+    "toolset": "orders",
     "params": [
       {
         "name": "shop_id",
@@ -2424,7 +2424,7 @@ export const operations: OperationDescriptor[] = [
       "transactions_r"
     ],
     "write": false,
-    "toolset": "all",
+    "toolset": "orders",
     "params": [
       {
         "name": "shop_id",
@@ -2454,7 +2454,7 @@ export const operations: OperationDescriptor[] = [
       "transactions_r"
     ],
     "write": false,
-    "toolset": "all",
+    "toolset": "orders",
     "params": [
       {
         "name": "shop_id",
@@ -2508,7 +2508,7 @@ export const operations: OperationDescriptor[] = [
       "transactions_r"
     ],
     "write": false,
-    "toolset": "all",
+    "toolset": "orders",
     "params": [
       {
         "name": "shop_id",
@@ -2545,7 +2545,7 @@ export const operations: OperationDescriptor[] = [
       "transactions_r"
     ],
     "write": false,
-    "toolset": "all",
+    "toolset": "orders",
     "params": [
       {
         "name": "shop_id",
@@ -2591,7 +2591,7 @@ export const operations: OperationDescriptor[] = [
       "transactions_r"
     ],
     "write": false,
-    "toolset": "all",
+    "toolset": "orders",
     "params": [
       {
         "name": "shop_id",
@@ -2722,7 +2722,7 @@ export const operations: OperationDescriptor[] = [
     "path": "/v3/application/shops/{shop_id}/policies/return",
     "scopes": [],
     "write": false,
-    "toolset": "all",
+    "toolset": "shop",
     "params": [
       {
         "name": "shop_id",
@@ -2742,7 +2742,7 @@ export const operations: OperationDescriptor[] = [
     "path": "/v3/application/shops/{shop_id}/policies/return/{return_policy_id}",
     "scopes": [],
     "write": false,
-    "toolset": "all",
+    "toolset": "shop",
     "params": [
       {
         "name": "shop_id",
@@ -2770,7 +2770,7 @@ export const operations: OperationDescriptor[] = [
     "path": "/v3/application/shops/{shop_id}/sections/{shop_section_id}",
     "scopes": [],
     "write": false,
-    "toolset": "all",
+    "toolset": "shop",
     "params": [
       {
         "name": "shop_id",
@@ -2798,7 +2798,7 @@ export const operations: OperationDescriptor[] = [
     "path": "/v3/application/shops/{shop_id}/sections",
     "scopes": [],
     "write": false,
-    "toolset": "all",
+    "toolset": "shop",
     "params": [
       {
         "name": "shop_id",
@@ -2820,7 +2820,7 @@ export const operations: OperationDescriptor[] = [
       "shops_r"
     ],
     "write": false,
-    "toolset": "all",
+    "toolset": "shipping",
     "params": [
       {
         "name": "shop_id",
@@ -2850,7 +2850,7 @@ export const operations: OperationDescriptor[] = [
       "shops_r"
     ],
     "write": false,
-    "toolset": "all",
+    "toolset": "shipping",
     "params": [
       {
         "name": "shop_id",
@@ -2897,7 +2897,7 @@ export const operations: OperationDescriptor[] = [
       "shops_r"
     ],
     "write": false,
-    "toolset": "all",
+    "toolset": "shipping",
     "params": [
       {
         "name": "shop_id",
@@ -2927,7 +2927,7 @@ export const operations: OperationDescriptor[] = [
       "shops_r"
     ],
     "write": false,
-    "toolset": "all",
+    "toolset": "shipping",
     "params": [
       {
         "name": "shop_id",
@@ -2949,7 +2949,7 @@ export const operations: OperationDescriptor[] = [
       "email_r"
     ],
     "write": false,
-    "toolset": "all",
+    "toolset": "users",
     "params": [
       {
         "name": "user_id",
@@ -2970,7 +2970,7 @@ export const operations: OperationDescriptor[] = [
       "address_r"
     ],
     "write": false,
-    "toolset": "all",
+    "toolset": "users",
     "params": [
       {
         "name": "user_address_id",
@@ -2992,7 +2992,7 @@ export const operations: OperationDescriptor[] = [
       "address_r"
     ],
     "write": false,
-    "toolset": "all",
+    "toolset": "users",
     "params": [
       {
         "name": "limit",
@@ -3021,7 +3021,7 @@ export const operations: OperationDescriptor[] = [
     "path": "/v3/application/openapi-ping",
     "scopes": [],
     "write": false,
-    "toolset": "all",
+    "toolset": "other",
     "params": []
   },
   {
@@ -3032,7 +3032,7 @@ export const operations: OperationDescriptor[] = [
     "path": "/v3/application/scopes",
     "scopes": [],
     "write": true,
-    "toolset": "all",
+    "toolset": "other",
     "params": []
   },
   {
@@ -3045,7 +3045,7 @@ export const operations: OperationDescriptor[] = [
       "shops_w"
     ],
     "write": true,
-    "toolset": "all",
+    "toolset": "shipping",
     "params": [
       {
         "name": "shop_id",
@@ -3181,7 +3181,7 @@ export const operations: OperationDescriptor[] = [
       "listings_w"
     ],
     "write": true,
-    "toolset": "all",
+    "toolset": "listings",
     "params": [
       {
         "name": "shop_id",
@@ -3211,7 +3211,7 @@ export const operations: OperationDescriptor[] = [
       "listings_w"
     ],
     "write": true,
-    "toolset": "all",
+    "toolset": "listings",
     "params": [
       {
         "name": "listing_id",
@@ -3251,7 +3251,7 @@ export const operations: OperationDescriptor[] = [
       "listings_w"
     ],
     "write": true,
-    "toolset": "all",
+    "toolset": "listings",
     "params": [
       {
         "name": "shop_id",
@@ -3288,7 +3288,7 @@ export const operations: OperationDescriptor[] = [
       "listings_w"
     ],
     "write": true,
-    "toolset": "all",
+    "toolset": "listings",
     "params": [
       {
         "name": "shop_id",
@@ -3326,7 +3326,7 @@ export const operations: OperationDescriptor[] = [
       "listings_w"
     ],
     "write": true,
-    "toolset": "all",
+    "toolset": "listings",
     "params": [
       {
         "name": "shop_id",
@@ -3364,7 +3364,7 @@ export const operations: OperationDescriptor[] = [
       "shops_w"
     ],
     "write": true,
-    "toolset": "all",
+    "toolset": "shop",
     "params": [
       {
         "name": "shop_id",
@@ -3386,7 +3386,7 @@ export const operations: OperationDescriptor[] = [
       "listings_w"
     ],
     "write": true,
-    "toolset": "all",
+    "toolset": "shop",
     "params": [
       {
         "name": "shop_id",
@@ -3416,7 +3416,7 @@ export const operations: OperationDescriptor[] = [
       "shops_w"
     ],
     "write": true,
-    "toolset": "all",
+    "toolset": "shipping",
     "params": [
       {
         "name": "shop_id",
@@ -3446,7 +3446,7 @@ export const operations: OperationDescriptor[] = [
       "transactions_w"
     ],
     "write": true,
-    "toolset": "all",
+    "toolset": "orders",
     "params": [
       {
         "name": "shop_id",
@@ -3483,7 +3483,7 @@ export const operations: OperationDescriptor[] = [
       "shops_w"
     ],
     "write": true,
-    "toolset": "all",
+    "toolset": "shop",
     "params": [
       {
         "name": "shop_id",
@@ -3513,7 +3513,7 @@ export const operations: OperationDescriptor[] = [
       "shops_w"
     ],
     "write": true,
-    "toolset": "all",
+    "toolset": "shop",
     "params": [
       {
         "name": "shop_id",
@@ -3543,7 +3543,7 @@ export const operations: OperationDescriptor[] = [
       "shops_w"
     ],
     "write": true,
-    "toolset": "all",
+    "toolset": "shipping",
     "params": [
       {
         "name": "shop_id",
@@ -3573,7 +3573,7 @@ export const operations: OperationDescriptor[] = [
       "shops_w"
     ],
     "write": true,
-    "toolset": "all",
+    "toolset": "shipping",
     "params": [
       {
         "name": "shop_id",
@@ -3611,7 +3611,7 @@ export const operations: OperationDescriptor[] = [
       "shops_w"
     ],
     "write": true,
-    "toolset": "all",
+    "toolset": "shipping",
     "params": [
       {
         "name": "shop_id",
@@ -3649,7 +3649,7 @@ export const operations: OperationDescriptor[] = [
       "listings_w"
     ],
     "write": true,
-    "toolset": "all",
+    "toolset": "listings",
     "params": [
       {
         "name": "shop_id",
@@ -3679,7 +3679,7 @@ export const operations: OperationDescriptor[] = [
       "listings_w"
     ],
     "write": true,
-    "toolset": "all",
+    "toolset": "listings",
     "params": [
       {
         "name": "shop_id",
@@ -3709,7 +3709,7 @@ export const operations: OperationDescriptor[] = [
       "listings_w"
     ],
     "write": true,
-    "toolset": "all",
+    "toolset": "listings",
     "params": [
       {
         "name": "shop_id",
@@ -3739,7 +3739,7 @@ export const operations: OperationDescriptor[] = [
       "listings_w"
     ],
     "write": true,
-    "toolset": "all",
+    "toolset": "listings",
     "params": [
       {
         "name": "shop_id",

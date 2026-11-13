@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 - Tools are now generated from a committed Etsy Spec Snapshot: 64 read Tools named by snake_case `operationId`. **Breaking:** the old hand-written names `find_shops`, `search_listings` and `get_shop_listings` are gone (use `get_listing`-style generated names). Non-2xx responses now return a Tool error (`isError`) with status and body. Input schemas carry enums, bounds, required/optional and array types from the spec; array query params are sent comma-joined.
 - Requests now send `x-api-key` as `keystring:shared_secret`; the new `ETSY_SHARED_SECRET` env var is required alongside `ETSY_API_KEY`, and the server fails at startup if either is missing.
+- Every Tool belongs to one of 8 Toolsets (`listings`, `shop`, `shipping`, `orders`, `reviews`, `taxonomy`, `users`, `other`), assigned from the Etsy tag; generation fails on an unmapped tag. New `ETSY_TOOLSETS` env var (comma-separated) narrows the offered Tools; unset means all, and an unknown or empty value fails at startup listing the valid names.
 - Server is built by a testable `createServer` factory; added Vitest tests.
 
 ## [0.1.1] - 2026-11-13
