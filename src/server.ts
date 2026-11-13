@@ -19,11 +19,27 @@ export type FetchLike = (url: URL, init: FetchInit) => Promise<Response>;
 export interface ServerDeps {
   fetch?: FetchLike;
   now?: () => number;
+  /** Waits between rate-limit retries (default setTimeout); tests inject it so they never wait. */
+  sleep?: (ms: number) => Promise<void>;
   /** Overrides how upload files are read (default streams from disk); tests inject it. */
   readFile?: (path: string) => Promise<Uint8Array>;
 }
 
 const API_BASE = "https://openapi.etsy.com";
+const MAX_RATE_LIMIT_RETRIES = 3;
+const DEFAULT_RETRY_MS = 1000;
+const MAX_RETRY_MS = 60_000;
+
+const defaultSleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+
+/** Retry-After is delta-seconds or an HTTP date; absent or unparseable means the 1s default. */
+function retryDelayMs(res: Response, now: number): number {
+  const header = res.headers.get("retry-after")?.trim();
+  if (!header) return DEFAULT_RETRY_MS;
+  const ms = /^\d+(\.\d+)?$/.test(header) ? Number(header) * 1000 : Date.parse(header) - now;
+  if (Number.isNaN(ms)) return DEFAULT_RETRY_MS;
+  return Math.min(Math.max(ms, 0), MAX_RETRY_MS);
+}
 
 export function valueSchema(v: ValueSchema): z.ZodType {
   const s = baseSchema(v);
@@ -177,6 +193,8 @@ function errorResult(text: string) {
 export function createServer(config: Config, deps: ServerDeps = {}): McpServer {
   const fetchImpl = deps.fetch ?? fetch;
   const { readFile } = deps;
+  const sleep = deps.sleep ?? defaultSleep;
+  const now = deps.now ?? Date.now;
   const openFile: OpenFile = readFile
     ? async (path, type) => new Blob([(await readFile(path)) as Uint8Array<ArrayBuffer>], { type })
     : openFromDisk;
@@ -210,18 +228,30 @@ export function createServer(config: Config, deps: ServerDeps = {}): McpServer {
           if (contentType) headers["Content-Type"] = contentType;
           return fetchImpl(url, { method: op.method, headers, body: requestBody });
         };
+        // One budget per Tool call, shared across the 401 refresh retry, so a call never exceeds 3 rate-limit retries.
+        let rateLimitRetries = 0;
+        const sendLimited = async (bearer?: string) => {
+          for (;;) {
+            const res = await send(bearer);
+            const dailyQuotaExhausted = res.headers.get("x-remaining-today") === "0";
+            if (res.status !== 429 || dailyQuotaExhausted || rateLimitRetries >= MAX_RATE_LIMIT_RETRIES) return res;
+            rateLimitRetries++;
+            await res.body?.cancel();
+            await sleep(retryDelayMs(res, now()));
+          }
+        };
         const needsOAuth = op.oauth2;
         let res: Response;
         try {
           if (needsOAuth) {
             const token = await tokens.getAccessToken();
-            res = await send(token);
+            res = await sendLimited(token);
             if (res.status === 401) {
               await res.body?.cancel();
-              res = await send(await tokens.refreshAfterRejection(token));
+              res = await sendLimited(await tokens.refreshAfterRejection(token));
             }
           } else {
-            res = await send();
+            res = await sendLimited();
           }
         } catch (err) {
           if (err instanceof TokenError) return errorResult(`${err.message} (needed by ${op.toolName})`);
