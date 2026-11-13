@@ -1,3 +1,6 @@
+export const TOOLSETS = ["listings", "shop", "shipping", "orders", "reviews", "taxonomy", "users", "other"] as const;
+export type Toolset = (typeof TOOLSETS)[number];
+
 export type ParamLocation = "path" | "query";
 export type ParamType = "integer" | "number" | "string" | "boolean" | "array";
 
@@ -24,6 +27,6 @@ export interface OperationDescriptor {
   path: string;
   scopes: string[];
   write: boolean;
-  toolset: string;
+  toolset: Toolset;
   params: ParamDescriptor[];
 }
