@@ -1,6 +1,6 @@
 import { mkdirSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { connect, tempConfigDir, TOKEN_ENDPOINT, type RecordedRequest } from "./harness.js";
 
 const NOW = 1_700_000_000_000;
@@ -17,7 +17,7 @@ function setup(respond: (req: RecordedRequest, call: number) => Response | Promi
     sleeps,
     connected: connect(config, (req) => respond(req, ++call), {
       now,
-      sleep: async (ms) => {
+      sleep: async (ms: number) => {
         sleeps.push(ms);
       },
     }),
@@ -57,11 +57,28 @@ describe("429 rate limiting", () => {
     expect(sleeps).toEqual([1000, 1000]);
   });
 
-  it("caps the wait at 60s", async () => {
-    const { sleeps, connected } = setup((_, n) => (n === 1 ? limited({ "retry-after": "3600" }) : new Response("{}")));
+  it("treats a Retry-After beyond 60s as quota exhaustion and returns it immediately", async () => {
+    const { sleeps, connected } = setup(() => limited({ "retry-after": "3600" }));
+    const { client, requests } = await connected;
+    const res = await client.callTool(SHOP);
+    expect(res.isError).toBe(true);
+    expect(JSON.stringify(res.content)).toContain("Daily Etsy API quota exhausted");
+    expect(requests).toHaveLength(1);
+    expect(sleeps).toEqual([]);
+  });
+
+  it("still retries a Retry-After of exactly 60s", async () => {
+    const { sleeps, connected } = setup((_, n) => (n === 1 ? limited({ "retry-after": "60" }) : new Response("{}")));
     const { client } = await connected;
     await client.callTool(SHOP);
     expect(sleeps).toEqual([60_000]);
+  });
+
+  it.each(["-5", "1e3", "nonsense!"])("falls back to the 1s default for Retry-After %j", async (value) => {
+    const { sleeps, connected } = setup((_, n) => (n === 1 ? limited({ "retry-after": value }) : new Response("{}")));
+    const { client } = await connected;
+    await client.callTool(SHOP);
+    expect(sleeps).toEqual([1000]);
   });
 
   it("honors an HTTP-date Retry-After", async () => {
@@ -78,6 +95,7 @@ describe("429 rate limiting", () => {
     const res = await client.callTool(SHOP);
     expect(res.isError).toBe(true);
     expect(JSON.stringify(res.content)).toContain("Etsy API 429: slow down");
+    expect(JSON.stringify(res.content)).toContain("gave up after 3 retries");
     expect(requests).toHaveLength(4);
     expect(sleeps).toHaveLength(3);
   });
@@ -88,6 +106,7 @@ describe("429 rate limiting", () => {
     const res = await client.callTool(SHOP);
     expect(res.isError).toBe(true);
     expect(JSON.stringify(res.content)).toContain("Etsy API 429");
+    expect(JSON.stringify(res.content)).toContain("Daily Etsy API quota exhausted");
     expect(requests).toHaveLength(1);
     expect(sleeps).toEqual([]);
   });
@@ -108,6 +127,39 @@ describe("429 rate limiting", () => {
     const res = await client.callTool({ name: "update_listing", arguments: { shop_id: 1, listing_id: 2, title: "t" } });
     expect(res.isError).toBeFalsy();
     expect(requests.map((r) => `${r.method} ${r.body}`)).toEqual(["PATCH title=t", "PATCH title=t"]);
+  });
+});
+
+describe("cancellation", () => {
+  it("aborts the wait and stops retrying when the MCP request is cancelled", async () => {
+    let sleepSignal: AbortSignal | undefined;
+    let sleepStarted!: () => void;
+    const started = new Promise<void>((r) => (sleepStarted = r));
+    let sleepEnded = false;
+    const { client, requests } = await connect({}, () => limited(), {
+      now,
+      sleep: (_ms, signal) => {
+        sleepSignal = signal;
+        sleepStarted();
+        return new Promise<void>((resolve) =>
+          signal?.addEventListener("abort", () => {
+            sleepEnded = true;
+            resolve();
+          }),
+        );
+      },
+    });
+    const controller = new AbortController();
+    const call = client.callTool(SHOP, undefined, { signal: controller.signal });
+    call.catch(() => {});
+    await started;
+    expect(requests).toHaveLength(1);
+    controller.abort();
+    await expect(call).rejects.toBeDefined();
+    await vi.waitFor(() => expect(sleepEnded).toBe(true));
+    await new Promise((r) => setTimeout(r, 20));
+    expect(sleepSignal?.aborted).toBe(true);
+    expect(requests).toHaveLength(1);
   });
 });
 
@@ -169,6 +221,6 @@ describe("429 composed with 401 refresh", () => {
     expect(JSON.stringify(res.content)).toContain("Etsy API 429");
     expect(requests.filter(isToken)).toHaveLength(1);
     expect(sleeps).toHaveLength(3);
-    expect(requests.length).toBeLessThanOrEqual(7);
+    expect(requests).toHaveLength(6);
   });
 });

@@ -19,8 +19,8 @@ export type FetchLike = (url: URL, init: FetchInit) => Promise<Response>;
 export interface ServerDeps {
   fetch?: FetchLike;
   now?: () => number;
-  /** Waits between rate-limit retries (default setTimeout); tests inject it so they never wait. */
-  sleep?: (ms: number) => Promise<void>;
+  /** Waits between rate-limit retries (default setTimeout); must resolve early when `signal` aborts. Tests inject it so they never wait. */
+  sleep?: (ms: number, signal?: AbortSignal) => Promise<void>;
   /** Overrides how upload files are read (default streams from disk); tests inject it. */
   readFile?: (path: string) => Promise<Uint8Array>;
 }
@@ -30,16 +30,34 @@ const MAX_RATE_LIMIT_RETRIES = 3;
 const DEFAULT_RETRY_MS = 1000;
 const MAX_RETRY_MS = 60_000;
 
-const defaultSleep = (ms: number) => new Promise<void>((resolve) => setTimeout(resolve, ms));
+const defaultSleep = (ms: number, signal?: AbortSignal) =>
+  new Promise<void>((resolve) => {
+    if (signal?.aborted) return resolve();
+    const done = () => {
+      clearTimeout(timer);
+      signal?.removeEventListener("abort", done);
+      resolve();
+    };
+    const timer = setTimeout(done, ms);
+    signal?.addEventListener("abort", done);
+  });
 
-/** Retry-After is delta-seconds or an HTTP date; absent or unparseable means the 1s default. */
+/**
+ * Retry-After is delta-seconds or an HTTP date; absent or unparseable means the 1s default.
+ * A wait beyond MAX_RETRY_MS signals an exhausted quota window rather than a burst limit, so it is not retried.
+ */
 function retryDelayMs(res: Response, now: number): number {
   const header = res.headers.get("retry-after")?.trim();
   if (!header) return DEFAULT_RETRY_MS;
-  const ms = /^\d+(\.\d+)?$/.test(header) ? Number(header) * 1000 : Date.parse(header) - now;
-  if (Number.isNaN(ms)) return DEFAULT_RETRY_MS;
-  return Math.min(Math.max(ms, 0), MAX_RETRY_MS);
+  let ms: number;
+  if (/^\d+(\.\d+)?$/.test(header)) ms = Number(header) * 1000;
+  else if (/[a-z]/i.test(header)) ms = Date.parse(header) - now;
+  else return DEFAULT_RETRY_MS;
+  return Number.isNaN(ms) ? DEFAULT_RETRY_MS : Math.max(ms, 0);
 }
+
+const QUOTA_HINT = "Daily Etsy API quota exhausted (rolling 24h window); retrying now will not help.";
+const RETRIES_EXHAUSTED_HINT = `Rate limited by Etsy; gave up after ${MAX_RATE_LIMIT_RETRIES} retries. Wait before calling again.`;
 
 export function valueSchema(v: ValueSchema): z.ZodType {
   const s = baseSchema(v);
@@ -213,7 +231,7 @@ export function createServer(config: Config, deps: ServerDeps = {}): McpServer {
     server.registerTool(
       op.toolName,
       { description: op.description, inputSchema: paramShape(op.params), annotations: toolAnnotations(op) },
-      async (args: Record<string, unknown>) => {
+      async (args: Record<string, unknown>, extra: { signal?: AbortSignal }) => {
         let built: Awaited<ReturnType<typeof buildRequest>>;
         try {
           built = await buildRequest(op, args, openFile);
@@ -230,14 +248,25 @@ export function createServer(config: Config, deps: ServerDeps = {}): McpServer {
         };
         // One budget per Tool call, shared across the 401 refresh retry, so a call never exceeds 3 rate-limit retries.
         let rateLimitRetries = 0;
+        let rateLimitHint = "";
         const sendLimited = async (bearer?: string) => {
           for (;;) {
             const res = await send(bearer);
-            const dailyQuotaExhausted = res.headers.get("x-remaining-today") === "0";
-            if (res.status !== 429 || dailyQuotaExhausted || rateLimitRetries >= MAX_RATE_LIMIT_RETRIES) return res;
+            rateLimitHint = "";
+            if (res.status !== 429) return res;
+            const delay = retryDelayMs(res, now());
+            if (res.headers.get("x-remaining-today") === "0" || delay > MAX_RETRY_MS) {
+              rateLimitHint = QUOTA_HINT;
+              return res;
+            }
+            if (rateLimitRetries >= MAX_RATE_LIMIT_RETRIES) {
+              rateLimitHint = RETRIES_EXHAUSTED_HINT;
+              return res;
+            }
             rateLimitRetries++;
+            await sleep(delay, extra.signal);
+            if (extra.signal?.aborted) return res;
             await res.body?.cancel();
-            await sleep(retryDelayMs(res, now()));
           }
         };
         const needsOAuth = op.oauth2;
@@ -263,7 +292,8 @@ export function createServer(config: Config, deps: ServerDeps = {}): McpServer {
             needsOAuth && res.status === 403
               ? `\nHint: the token may lack the required scopes (${op.scopes.join(", ")}). Re-run \`${LOGIN_COMMAND}\` with those scopes.`
               : "";
-          return errorResult(`Etsy API ${res.status}: ${body}${hint}`);
+          const limitHint = res.status === 429 && rateLimitHint ? `\nHint: ${rateLimitHint}` : "";
+          return errorResult(`Etsy API ${res.status}: ${body}${hint}${limitHint}`);
         }
         return { content: [{ type: "text" as const, text: body }] };
       },

@@ -39,7 +39,7 @@ Every Tool belongs to exactly one Toolset: `listings`, `shop`, `shipping`, `orde
 
 ### Rate limits
 
-A 429 response is retried up to 3 times per Tool call, waiting the `Retry-After` value (default 1s if absent, capped at 60s); after that the 429 is returned as a Tool error. A 429 with `x-remaining-today: 0` means the daily quota is exhausted and is returned immediately without retrying.
+A 429 response is retried up to 3 times per Tool call, waiting the `Retry-After` value (default 1s if absent, capped at 60s); after that the 429 is returned as a Tool error. A 429 is treated as daily-quota exhaustion and returned immediately without retrying when it carries `x-remaining-today: 0` or a `Retry-After` longer than 60s; the error then says retrying will not help. Cancelling the MCP request aborts the wait and stops retrying.
 
 ### File uploads
 
