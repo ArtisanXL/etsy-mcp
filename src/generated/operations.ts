@@ -1042,7 +1042,19 @@ export const operations: OperationDescriptor[] = [
         "in": "query",
         "required": false,
         "type": "array",
-        "description": "An enumerated string that attaches a valid association. Acceptable inputs are 'Shop', 'Images', 'User', 'Translations', 'Videos', 'Personalization' and 'BuyerPrice'."
+        "description": "An enumerated string that attaches a valid association. Acceptable inputs are 'Shop', 'Images', 'User', 'Translations', 'Videos', 'Personalization' and 'BuyerPrice'.",
+        "items": {
+          "type": "string",
+          "enum": [
+            "Images",
+            "Shop",
+            "User",
+            "Translations",
+            "Videos",
+            "Personalization",
+            "BuyerPrice"
+          ]
+        }
       },
       {
         "name": "language",
@@ -1424,14 +1436,30 @@ export const operations: OperationDescriptor[] = [
         "in": "query",
         "required": true,
         "type": "array",
-        "description": "The list of numeric IDS for the listings in a specific Etsy shop."
+        "description": "The list of numeric IDS for the listings in a specific Etsy shop.",
+        "items": {
+          "type": "integer",
+          "minimum": 1
+        }
       },
       {
         "name": "includes",
         "in": "query",
         "required": false,
         "type": "array",
-        "description": "An enumerated string that attaches a valid association. Acceptable inputs are 'Shop', 'Images', 'User', 'Translations', 'Videos', 'Personalization' and 'BuyerPrice'."
+        "description": "An enumerated string that attaches a valid association. Acceptable inputs are 'Shop', 'Images', 'User', 'Translations', 'Videos', 'Personalization' and 'BuyerPrice'.",
+        "items": {
+          "type": "string",
+          "enum": [
+            "Images",
+            "Shop",
+            "User",
+            "Translations",
+            "Videos",
+            "Personalization",
+            "BuyerPrice"
+          ]
+        }
       },
       {
         "name": "legacy",
@@ -1541,7 +1569,21 @@ export const operations: OperationDescriptor[] = [
         "in": "query",
         "required": false,
         "type": "array",
-        "description": "An enumerated string that attaches a valid association. Acceptable inputs are 'Shipping', 'Shop', 'Images', 'User', 'Translations', 'Videos', 'Inventory' and 'Personalization'."
+        "description": "An enumerated string that attaches a valid association. Acceptable inputs are 'Shipping', 'Shop', 'Images', 'User', 'Translations', 'Videos', 'Inventory' and 'Personalization'.",
+        "items": {
+          "type": "string",
+          "enum": [
+            "Shipping",
+            "Images",
+            "Shop",
+            "User",
+            "Translations",
+            "Inventory",
+            "Videos",
+            "Personalization",
+            "BuyerPrice"
+          ]
+        }
       }
     ]
   },
@@ -1659,7 +1701,11 @@ export const operations: OperationDescriptor[] = [
         "in": "query",
         "required": true,
         "type": "array",
-        "description": "A list of numeric IDS for all sections in a specific Etsy shop."
+        "description": "A list of numeric IDS for all sections in a specific Etsy shop.",
+        "items": {
+          "type": "integer",
+          "minimum": 1
+        }
       },
       {
         "name": "limit",
@@ -1732,7 +1778,11 @@ export const operations: OperationDescriptor[] = [
         "in": "query",
         "required": true,
         "type": "array",
-        "description": "The list of numeric IDS for the listings in a specific Etsy shop."
+        "description": "The list of numeric IDS for the listings in a specific Etsy shop.",
+        "items": {
+          "type": "integer",
+          "minimum": 1
+        }
       }
     ]
   },
@@ -1753,7 +1803,11 @@ export const operations: OperationDescriptor[] = [
         "in": "query",
         "required": true,
         "type": "array",
-        "description": "The list of numeric IDS for the listings in a specific Etsy shop."
+        "description": "The list of numeric IDS for the listings in a specific Etsy shop.",
+        "items": {
+          "type": "integer",
+          "minimum": 1
+        }
       }
     ]
   },
@@ -1794,7 +1848,11 @@ export const operations: OperationDescriptor[] = [
         "name": "ledger_entry_ids",
         "in": "query",
         "required": true,
-        "type": "array"
+        "type": "array",
+        "items": {
+          "type": "integer",
+          "minimum": 1
+        }
       }
     ]
   },
@@ -1823,7 +1881,11 @@ export const operations: OperationDescriptor[] = [
         "in": "query",
         "required": true,
         "type": "array",
-        "description": "A comma-separated array of Payment IDs numbers."
+        "description": "A comma-separated array of Payment IDs numbers.",
+        "items": {
+          "type": "integer",
+          "minimum": 1
+        }
       }
     ]
   },

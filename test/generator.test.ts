@@ -63,6 +63,49 @@ describe("generateOperations", () => {
   });
 });
 
+describe("schema fidelity", () => {
+  const param = (p: unknown, components?: unknown) =>
+    generateOperations({
+      components,
+      paths: { "/a": { get: { operationId: "getA", parameters: [p] } } },
+    })[0].params[0];
+
+  it("resolves $ref parameters and schemas", () => {
+    const p = param(
+      { $ref: "#/components/parameters/Limit" },
+      {
+        parameters: { Limit: { name: "limit", in: "query", schema: { $ref: "#/components/schemas/Lim" } } },
+        schemas: { Lim: { type: "integer", minimum: 1, maximum: 100 } },
+      },
+    );
+    expect(p).toEqual({ name: "limit", in: "query", required: false, type: "integer", minimum: 1, maximum: 100 });
+  });
+
+  it("fails on an unresolvable $ref", () => {
+    expect(() => param({ $ref: "#/components/parameters/Nope" }, {})).toThrow(/Unresolvable \$ref/);
+  });
+
+  it("keeps array item schemas with enums and bounds", () => {
+    const p = param({
+      name: "ids",
+      in: "query",
+      required: true,
+      schema: { type: "array", items: { type: "integer", format: "int64", minimum: 1 } },
+    });
+    expect(p).toMatchObject({ type: "array", required: true, items: { type: "integer", minimum: 1 } });
+    expect(
+      param({ name: "inc", in: "query", schema: { type: "array", items: { type: "string", enum: ["A", "B"] } } })
+        .items,
+    ).toEqual({ type: "string", enum: ["A", "B"] });
+  });
+
+  it("treats nullable parameters as not required", () => {
+    expect(
+      param({ name: "x", in: "query", required: true, schema: { type: "boolean", nullable: true } }).required,
+    ).toBe(false);
+  });
+});
+
 describe("toToolName", () => {
   it("snake_cases operationIds", () => {
     expect(toToolName("getListingsByShop")).toBe("get_listings_by_shop");
