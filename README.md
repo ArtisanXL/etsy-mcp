@@ -31,7 +31,7 @@ claude mcp add etsy -e ETSY_API_KEY=your-keystring -e ETSY_SHARED_SECRET=your-sh
 
 ## Tools
 
-One Tool per Etsy Open API v3 Operation (107), named as the snake_case `operationId` (e.g. `get_listing`, `get_listings_by_shop`) and generated from the committed spec in `spec/`. Input schemas (enums, bounds, required/optional, arrays) come from the spec; path, query and body fields form one flat input set. Array query and form-urlencoded body values are sent comma-joined (e.g. `listing_ids=1,2,3`, `tags=blue,mug`); JSON bodies (e.g. `update_listing_inventory`) are sent as real JSON with nested objects and arrays. Regenerate with `npm run gen:local`.
+One Tool per Etsy Open API v3 Operation (107), named as the snake_case `operationId` (e.g. `get_listing`, `get_listings_by_shop`) and generated from the committed spec in `spec/`. Input schemas (enums, bounds, required/optional, arrays) come from the spec; path, query and body fields form one flat input set. Array query and form-urlencoded body values are sent comma-joined (e.g. `listing_ids=1,2,3`, `tags=blue,mug`); JSON bodies (e.g. `update_listing_inventory`) are sent as real JSON with nested objects and arrays. Regenerate offline with `npm run gen:local`; `npm run gen` first downloads the latest Etsy spec into the Spec Snapshot, then runs `gen:local`. A weekly GitHub Action (`spec-refresh`) runs `npm run gen` and opens a PR when anything changed (and closes it again if the snapshot is back in sync). Without a `SPEC_REFRESH_TOKEN` secret (a PAT) it uses `GITHUB_TOKEN`: the repo setting "Allow GitHub Actions to create and approve pull requests" must be enabled, and refresh PRs won't trigger CI.
 
 ### Toolsets
 
