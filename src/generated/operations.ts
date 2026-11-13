@@ -11,6 +11,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "shops_w"
     ],
+    "oauth2": true,
     "write": true,
     "toolset": "shop",
     "params": [
@@ -33,6 +34,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "listings_w"
     ],
+    "oauth2": true,
     "write": true,
     "toolset": "listings",
     "params": [
@@ -55,6 +57,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "listings_w"
     ],
+    "oauth2": true,
     "write": true,
     "toolset": "listings",
     "params": [
@@ -92,6 +95,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "transactions_w"
     ],
+    "oauth2": true,
     "write": true,
     "toolset": "orders",
     "params": [
@@ -129,6 +133,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "listings_w"
     ],
+    "oauth2": true,
     "write": true,
     "toolset": "shop",
     "params": [
@@ -151,6 +156,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "shops_w"
     ],
+    "oauth2": true,
     "write": true,
     "toolset": "shipping",
     "params": [
@@ -173,6 +179,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "shops_w"
     ],
+    "oauth2": true,
     "write": true,
     "toolset": "shop",
     "params": [
@@ -195,6 +202,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "shops_w"
     ],
+    "oauth2": true,
     "write": true,
     "toolset": "shop",
     "params": [
@@ -217,6 +225,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "shops_w"
     ],
+    "oauth2": true,
     "write": true,
     "toolset": "shipping",
     "params": [
@@ -239,6 +248,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "shops_w"
     ],
+    "oauth2": true,
     "write": true,
     "toolset": "shipping",
     "params": [
@@ -269,6 +279,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "shops_w"
     ],
+    "oauth2": true,
     "write": true,
     "toolset": "shipping",
     "params": [
@@ -299,6 +310,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "listings_d"
     ],
+    "oauth2": true,
     "write": true,
     "toolset": "listings",
     "params": [
@@ -321,6 +333,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "listings_w"
     ],
+    "oauth2": true,
     "write": true,
     "toolset": "listings",
     "params": [
@@ -359,6 +372,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "listings_w"
     ],
+    "oauth2": true,
     "write": true,
     "toolset": "listings",
     "params": [
@@ -397,6 +411,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "listings_w"
     ],
+    "oauth2": true,
     "write": true,
     "toolset": "listings",
     "params": [
@@ -427,6 +442,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "listings_w"
     ],
+    "oauth2": true,
     "write": true,
     "toolset": "listings",
     "params": [
@@ -465,6 +481,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "listings_w"
     ],
+    "oauth2": true,
     "write": true,
     "toolset": "listings",
     "params": [
@@ -503,6 +520,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "shops_w"
     ],
+    "oauth2": true,
     "write": true,
     "toolset": "shipping",
     "params": [
@@ -533,6 +551,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "shops_w"
     ],
+    "oauth2": true,
     "write": true,
     "toolset": "shop",
     "params": [
@@ -563,6 +582,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "shops_w"
     ],
+    "oauth2": true,
     "write": true,
     "toolset": "shop",
     "params": [
@@ -593,6 +613,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "shops_w"
     ],
+    "oauth2": true,
     "write": true,
     "toolset": "shipping",
     "params": [
@@ -623,6 +644,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "shops_w"
     ],
+    "oauth2": true,
     "write": true,
     "toolset": "shipping",
     "params": [
@@ -661,6 +683,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "shops_w"
     ],
+    "oauth2": true,
     "write": true,
     "toolset": "shipping",
     "params": [
@@ -697,6 +720,7 @@ export const operations: OperationDescriptor[] = [
     "method": "GET",
     "path": "/v3/application/shops/{shop_id}/listings/active",
     "scopes": [],
+    "oauth2": false,
     "write": false,
     "toolset": "listings",
     "params": [
@@ -769,6 +793,7 @@ export const operations: OperationDescriptor[] = [
     "method": "GET",
     "path": "/v3/application/listings/active",
     "scopes": [],
+    "oauth2": false,
     "write": false,
     "toolset": "listings",
     "params": [
@@ -883,6 +908,7 @@ export const operations: OperationDescriptor[] = [
     "method": "GET",
     "path": "/v3/application/shops",
     "scopes": [],
+    "oauth2": false,
     "write": false,
     "toolset": "shop",
     "params": [
@@ -921,6 +947,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "listings_r"
     ],
+    "oauth2": true,
     "write": false,
     "toolset": "listings",
     "params": [
@@ -949,6 +976,7 @@ export const operations: OperationDescriptor[] = [
     "method": "GET",
     "path": "/v3/application/buyer-taxonomy/nodes",
     "scopes": [],
+    "oauth2": false,
     "write": false,
     "toolset": "taxonomy",
     "params": []
@@ -960,6 +988,7 @@ export const operations: OperationDescriptor[] = [
     "method": "GET",
     "path": "/v3/application/shops/{shop_id}/listings/featured",
     "scopes": [],
+    "oauth2": false,
     "write": false,
     "toolset": "listings",
     "params": [
@@ -1006,6 +1035,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "shops_r"
     ],
+    "oauth2": true,
     "write": false,
     "toolset": "shipping",
     "params": [
@@ -1026,6 +1056,7 @@ export const operations: OperationDescriptor[] = [
     "method": "GET",
     "path": "/v3/application/listings/{listing_id}",
     "scopes": [],
+    "oauth2": false,
     "write": false,
     "toolset": "listings",
     "params": [
@@ -1081,6 +1112,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "listings_r"
     ],
+    "oauth2": true,
     "write": false,
     "toolset": "listings",
     "params": [
@@ -1117,6 +1149,7 @@ export const operations: OperationDescriptor[] = [
     "method": "GET",
     "path": "/v3/application/listings/{listing_id}/images/{listing_image_id}",
     "scopes": [],
+    "oauth2": false,
     "write": false,
     "toolset": "listings",
     "params": [
@@ -1145,6 +1178,7 @@ export const operations: OperationDescriptor[] = [
     "method": "GET",
     "path": "/v3/application/listings/{listing_id}/images",
     "scopes": [],
+    "oauth2": false,
     "write": false,
     "toolset": "listings",
     "params": [
@@ -1167,6 +1201,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "listings_r"
     ],
+    "oauth2": true,
     "write": false,
     "toolset": "listings",
     "params": [
@@ -1204,6 +1239,7 @@ export const operations: OperationDescriptor[] = [
     "method": "GET",
     "path": "/v3/application/listings/{listing_id}/personalization",
     "scopes": [],
+    "oauth2": false,
     "write": false,
     "toolset": "listings",
     "params": [
@@ -1226,6 +1262,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "listings_r"
     ],
+    "oauth2": true,
     "write": false,
     "toolset": "listings",
     "params": [
@@ -1261,6 +1298,7 @@ export const operations: OperationDescriptor[] = [
     "method": "GET",
     "path": "/v3/application/shops/{shop_id}/listings/{listing_id}/properties",
     "scopes": [],
+    "oauth2": false,
     "write": false,
     "toolset": "listings",
     "params": [
@@ -1289,6 +1327,7 @@ export const operations: OperationDescriptor[] = [
     "method": "GET",
     "path": "/v3/application/listings/{listing_id}/properties/{property_id}",
     "scopes": [],
+    "oauth2": false,
     "write": false,
     "toolset": "listings",
     "params": [
@@ -1317,6 +1356,7 @@ export const operations: OperationDescriptor[] = [
     "method": "GET",
     "path": "/v3/application/shops/{shop_id}/listings/{listing_id}/translations/{language}",
     "scopes": [],
+    "oauth2": false,
     "write": false,
     "toolset": "listings",
     "params": [
@@ -1352,6 +1392,7 @@ export const operations: OperationDescriptor[] = [
     "method": "GET",
     "path": "/v3/application/shops/{shop_id}/listings/{listing_id}/variation-images",
     "scopes": [],
+    "oauth2": false,
     "write": false,
     "toolset": "listings",
     "params": [
@@ -1380,6 +1421,7 @@ export const operations: OperationDescriptor[] = [
     "method": "GET",
     "path": "/v3/application/listings/{listing_id}/videos/{video_id}",
     "scopes": [],
+    "oauth2": false,
     "write": false,
     "toolset": "listings",
     "params": [
@@ -1408,6 +1450,7 @@ export const operations: OperationDescriptor[] = [
     "method": "GET",
     "path": "/v3/application/listings/{listing_id}/videos",
     "scopes": [],
+    "oauth2": false,
     "write": false,
     "toolset": "listings",
     "params": [
@@ -1428,6 +1471,7 @@ export const operations: OperationDescriptor[] = [
     "method": "GET",
     "path": "/v3/application/listings/batch",
     "scopes": [],
+    "oauth2": false,
     "write": false,
     "toolset": "listings",
     "params": [
@@ -1493,6 +1537,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "listings_r"
     ],
+    "oauth2": true,
     "write": false,
     "toolset": "listings",
     "params": [
@@ -1596,6 +1641,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "transactions_r"
     ],
+    "oauth2": true,
     "write": false,
     "toolset": "listings",
     "params": [
@@ -1650,6 +1696,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "listings_r"
     ],
+    "oauth2": true,
     "write": false,
     "toolset": "listings",
     "params": [
@@ -1685,6 +1732,7 @@ export const operations: OperationDescriptor[] = [
     "method": "GET",
     "path": "/v3/application/shops/{shop_id}/shop-sections/listings",
     "scopes": [],
+    "oauth2": false,
     "write": false,
     "toolset": "listings",
     "params": [
@@ -1770,6 +1818,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "listings_r"
     ],
+    "oauth2": true,
     "write": false,
     "toolset": "listings",
     "params": [
@@ -1795,6 +1844,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "shops_r"
     ],
+    "oauth2": true,
     "write": false,
     "toolset": "listings",
     "params": [
@@ -1820,6 +1870,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "shops_r"
     ],
+    "oauth2": true,
     "write": false,
     "toolset": "users",
     "params": []
@@ -1833,6 +1884,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "transactions_r"
     ],
+    "oauth2": true,
     "write": false,
     "toolset": "orders",
     "params": [
@@ -1865,6 +1917,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "transactions_r"
     ],
+    "oauth2": true,
     "write": false,
     "toolset": "orders",
     "params": [
@@ -1896,6 +1949,7 @@ export const operations: OperationDescriptor[] = [
     "method": "GET",
     "path": "/v3/application/buyer-taxonomy/nodes/{taxonomy_id}/properties",
     "scopes": [],
+    "oauth2": false,
     "write": false,
     "toolset": "taxonomy",
     "params": [
@@ -1916,6 +1970,7 @@ export const operations: OperationDescriptor[] = [
     "method": "GET",
     "path": "/v3/application/seller-taxonomy/nodes/{taxonomy_id}/properties",
     "scopes": [],
+    "oauth2": false,
     "write": false,
     "toolset": "taxonomy",
     "params": [
@@ -1950,6 +2005,7 @@ export const operations: OperationDescriptor[] = [
     "method": "GET",
     "path": "/v3/application/listings/{listing_id}/reviews",
     "scopes": [],
+    "oauth2": false,
     "write": false,
     "toolset": "reviews",
     "params": [
@@ -2003,6 +2059,7 @@ export const operations: OperationDescriptor[] = [
     "method": "GET",
     "path": "/v3/application/shops/{shop_id}/reviews",
     "scopes": [],
+    "oauth2": false,
     "write": false,
     "toolset": "reviews",
     "params": [
@@ -2056,6 +2113,7 @@ export const operations: OperationDescriptor[] = [
     "method": "GET",
     "path": "/v3/application/seller-taxonomy/nodes",
     "scopes": [],
+    "oauth2": false,
     "write": false,
     "toolset": "taxonomy",
     "params": []
@@ -2067,6 +2125,7 @@ export const operations: OperationDescriptor[] = [
     "method": "GET",
     "path": "/v3/application/shipping-carriers",
     "scopes": [],
+    "oauth2": false,
     "write": false,
     "toolset": "shipping",
     "params": [
@@ -2086,6 +2145,7 @@ export const operations: OperationDescriptor[] = [
     "method": "GET",
     "path": "/v3/application/shops/{shop_id}",
     "scopes": [],
+    "oauth2": false,
     "write": false,
     "toolset": "shop",
     "params": [
@@ -2106,6 +2166,7 @@ export const operations: OperationDescriptor[] = [
     "method": "GET",
     "path": "/v3/application/users/{user_id}/shops",
     "scopes": [],
+    "oauth2": false,
     "write": false,
     "toolset": "shop",
     "params": [
@@ -2128,6 +2189,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "listings_r"
     ],
+    "oauth2": true,
     "write": false,
     "toolset": "shop",
     "params": [
@@ -2158,6 +2220,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "listings_r"
     ],
+    "oauth2": true,
     "write": false,
     "toolset": "shop",
     "params": [
@@ -2180,6 +2243,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "transactions_r"
     ],
+    "oauth2": true,
     "write": false,
     "toolset": "orders",
     "params": [
@@ -2235,6 +2299,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "transactions_r"
     ],
+    "oauth2": true,
     "write": false,
     "toolset": "orders",
     "params": [
@@ -2265,6 +2330,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "transactions_r"
     ],
+    "oauth2": true,
     "write": false,
     "toolset": "orders",
     "params": [
@@ -2295,6 +2361,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "shops_r"
     ],
+    "oauth2": true,
     "write": false,
     "toolset": "shop",
     "params": [
@@ -2317,6 +2384,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "shops_r"
     ],
+    "oauth2": true,
     "write": false,
     "toolset": "shipping",
     "params": [
@@ -2347,6 +2415,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "shops_r"
     ],
+    "oauth2": true,
     "write": false,
     "toolset": "shipping",
     "params": [
@@ -2386,6 +2455,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "transactions_r"
     ],
+    "oauth2": true,
     "write": false,
     "toolset": "orders",
     "params": [
@@ -2423,6 +2493,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "transactions_r"
     ],
+    "oauth2": true,
     "write": false,
     "toolset": "orders",
     "params": [
@@ -2453,6 +2524,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "transactions_r"
     ],
+    "oauth2": true,
     "write": false,
     "toolset": "orders",
     "params": [
@@ -2507,6 +2579,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "transactions_r"
     ],
+    "oauth2": true,
     "write": false,
     "toolset": "orders",
     "params": [
@@ -2544,6 +2617,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "transactions_r"
     ],
+    "oauth2": true,
     "write": false,
     "toolset": "orders",
     "params": [
@@ -2590,6 +2664,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "transactions_r"
     ],
+    "oauth2": true,
     "write": false,
     "toolset": "orders",
     "params": [
@@ -2721,6 +2796,7 @@ export const operations: OperationDescriptor[] = [
     "method": "GET",
     "path": "/v3/application/shops/{shop_id}/policies/return",
     "scopes": [],
+    "oauth2": false,
     "write": false,
     "toolset": "shop",
     "params": [
@@ -2741,6 +2817,7 @@ export const operations: OperationDescriptor[] = [
     "method": "GET",
     "path": "/v3/application/shops/{shop_id}/policies/return/{return_policy_id}",
     "scopes": [],
+    "oauth2": false,
     "write": false,
     "toolset": "shop",
     "params": [
@@ -2769,6 +2846,7 @@ export const operations: OperationDescriptor[] = [
     "method": "GET",
     "path": "/v3/application/shops/{shop_id}/sections/{shop_section_id}",
     "scopes": [],
+    "oauth2": false,
     "write": false,
     "toolset": "shop",
     "params": [
@@ -2797,6 +2875,7 @@ export const operations: OperationDescriptor[] = [
     "method": "GET",
     "path": "/v3/application/shops/{shop_id}/sections",
     "scopes": [],
+    "oauth2": false,
     "write": false,
     "toolset": "shop",
     "params": [
@@ -2819,6 +2898,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "shops_r"
     ],
+    "oauth2": true,
     "write": false,
     "toolset": "shipping",
     "params": [
@@ -2849,6 +2929,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "shops_r"
     ],
+    "oauth2": true,
     "write": false,
     "toolset": "shipping",
     "params": [
@@ -2896,6 +2977,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "shops_r"
     ],
+    "oauth2": true,
     "write": false,
     "toolset": "shipping",
     "params": [
@@ -2926,6 +3008,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "shops_r"
     ],
+    "oauth2": true,
     "write": false,
     "toolset": "shipping",
     "params": [
@@ -2948,6 +3031,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "email_r"
     ],
+    "oauth2": true,
     "write": false,
     "toolset": "users",
     "params": [
@@ -2969,6 +3053,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "address_r"
     ],
+    "oauth2": true,
     "write": false,
     "toolset": "users",
     "params": [
@@ -2991,6 +3076,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "address_r"
     ],
+    "oauth2": true,
     "write": false,
     "toolset": "users",
     "params": [
@@ -3020,6 +3106,7 @@ export const operations: OperationDescriptor[] = [
     "method": "GET",
     "path": "/v3/application/openapi-ping",
     "scopes": [],
+    "oauth2": false,
     "write": false,
     "toolset": "other",
     "params": []
@@ -3031,6 +3118,7 @@ export const operations: OperationDescriptor[] = [
     "method": "POST",
     "path": "/v3/application/scopes",
     "scopes": [],
+    "oauth2": false,
     "write": true,
     "toolset": "other",
     "params": []
@@ -3044,6 +3132,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "shops_w"
     ],
+    "oauth2": true,
     "write": true,
     "toolset": "shipping",
     "params": [
@@ -3180,6 +3269,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "listings_w"
     ],
+    "oauth2": true,
     "write": true,
     "toolset": "listings",
     "params": [
@@ -3210,6 +3300,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "listings_w"
     ],
+    "oauth2": true,
     "write": true,
     "toolset": "listings",
     "params": [
@@ -3250,6 +3341,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "listings_w"
     ],
+    "oauth2": true,
     "write": true,
     "toolset": "listings",
     "params": [
@@ -3287,6 +3379,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "listings_w"
     ],
+    "oauth2": true,
     "write": true,
     "toolset": "listings",
     "params": [
@@ -3325,6 +3418,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "listings_w"
     ],
+    "oauth2": true,
     "write": true,
     "toolset": "listings",
     "params": [
@@ -3363,6 +3457,7 @@ export const operations: OperationDescriptor[] = [
       "shops_r",
       "shops_w"
     ],
+    "oauth2": true,
     "write": true,
     "toolset": "shop",
     "params": [
@@ -3385,6 +3480,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "listings_w"
     ],
+    "oauth2": true,
     "write": true,
     "toolset": "shop",
     "params": [
@@ -3415,6 +3511,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "shops_w"
     ],
+    "oauth2": true,
     "write": true,
     "toolset": "shipping",
     "params": [
@@ -3445,6 +3542,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "transactions_w"
     ],
+    "oauth2": true,
     "write": true,
     "toolset": "orders",
     "params": [
@@ -3482,6 +3580,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "shops_w"
     ],
+    "oauth2": true,
     "write": true,
     "toolset": "shop",
     "params": [
@@ -3512,6 +3611,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "shops_w"
     ],
+    "oauth2": true,
     "write": true,
     "toolset": "shop",
     "params": [
@@ -3542,6 +3642,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "shops_w"
     ],
+    "oauth2": true,
     "write": true,
     "toolset": "shipping",
     "params": [
@@ -3572,6 +3673,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "shops_w"
     ],
+    "oauth2": true,
     "write": true,
     "toolset": "shipping",
     "params": [
@@ -3610,6 +3712,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "shops_w"
     ],
+    "oauth2": true,
     "write": true,
     "toolset": "shipping",
     "params": [
@@ -3648,6 +3751,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "listings_w"
     ],
+    "oauth2": true,
     "write": true,
     "toolset": "listings",
     "params": [
@@ -3678,6 +3782,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "listings_w"
     ],
+    "oauth2": true,
     "write": true,
     "toolset": "listings",
     "params": [
@@ -3708,6 +3813,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "listings_w"
     ],
+    "oauth2": true,
     "write": true,
     "toolset": "listings",
     "params": [
@@ -3738,6 +3844,7 @@ export const operations: OperationDescriptor[] = [
     "scopes": [
       "listings_w"
     ],
+    "oauth2": true,
     "write": true,
     "toolset": "listings",
     "params": [

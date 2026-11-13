@@ -1,10 +1,21 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import type { Config } from "./config.js";
+import { LOGIN_COMMAND, TokenError, TokenStore } from "./token-store.js";
 import { operations } from "./generated/operations.js";
 import type { ParamDescriptor, ValueSchema } from "./operation.js";
 
-export type FetchLike = (url: URL, init: { headers: Record<string, string> }) => Promise<Response>;
+export interface FetchInit {
+  method?: "GET" | "POST";
+  headers: Record<string, string>;
+  body?: string;
+}
+export type FetchLike = (url: URL, init: FetchInit) => Promise<Response>;
+
+export interface ServerDeps {
+  fetch?: FetchLike;
+  now?: () => number;
+}
 
 const API_BASE = "https://openapi.etsy.com";
 
@@ -33,7 +44,19 @@ function paramSchema(p: ParamDescriptor): z.ZodType {
   return p.required ? s : s.optional();
 }
 
-export function createServer(config: Config, fetchImpl: FetchLike = fetch): McpServer {
+function errorResult(text: string) {
+  return { isError: true, content: [{ type: "text" as const, text }] };
+}
+
+export function createServer(config: Config, deps: ServerDeps = {}): McpServer {
+  const fetchImpl = deps.fetch ?? fetch;
+  const tokens = new TokenStore({
+    configDir: config.configDir,
+    apiKey: config.apiKey,
+    seedRefreshToken: config.refreshToken,
+    fetch: fetchImpl,
+    now: deps.now,
+  });
   const server = new McpServer({ name: "etsy-mcp", version: "0.1.1" });
 
   const enabled = config.toolsets && new Set<string>(config.toolsets);
@@ -52,17 +75,35 @@ export function createServer(config: Config, fetchImpl: FetchLike = fetch): McpS
           else url.searchParams.set(p.name, Array.isArray(v) ? v.join(",") : String(v));
         }
         url.pathname = path;
-        const headers: Record<string, string> = {
-          "x-api-key": `${config.apiKey}:${config.sharedSecret}`,
+        const send = (bearer?: string) => {
+          const headers: Record<string, string> = { "x-api-key": `${config.apiKey}:${config.sharedSecret}` };
+          if (bearer) headers.Authorization = `Bearer ${bearer}`;
+          return fetchImpl(url, { headers });
         };
-        if (config.accessToken) headers.Authorization = `Bearer ${config.accessToken}`;
-        const res = await fetchImpl(url, { headers });
+        const needsOAuth = op.oauth2;
+        let res: Response;
+        try {
+          if (needsOAuth) {
+            const token = await tokens.getAccessToken();
+            res = await send(token);
+            if (res.status === 401) {
+              await res.body?.cancel();
+              res = await send(await tokens.refreshAfterRejection(token));
+            }
+          } else {
+            res = await send();
+          }
+        } catch (err) {
+          if (err instanceof TokenError) return errorResult(`${err.message} (needed by ${op.toolName})`);
+          throw err;
+        }
         const body = await res.text();
         if (!res.ok) {
-          return {
-            isError: true,
-            content: [{ type: "text" as const, text: `Etsy API ${res.status}: ${body}` }],
-          };
+          const hint =
+            needsOAuth && res.status === 403
+              ? `\nHint: the token may lack the required scopes (${op.scopes.join(", ")}). Re-run \`${LOGIN_COMMAND}\` with those scopes.`
+              : "";
+          return errorResult(`Etsy API ${res.status}: ${body}${hint}`);
         }
         return { content: [{ type: "text" as const, text: body }] };
       },

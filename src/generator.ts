@@ -75,6 +75,7 @@ export function generateOperations(spec: any): OperationDescriptor[] {
         method: method.toUpperCase() as OperationDescriptor["method"],
         path,
         scopes: [...new Set<string>((op.security ?? []).flatMap((s: any) => s.oauth2 ?? []))],
+        oauth2: (op.security ?? []).some((s: any) => Object.hasOwn(s, "oauth2")),
         write: method !== "get",
         toolset: toToolset(op.tags, label),
         params: (op.parameters ?? []).map((p: any) => toParam(spec, p)),

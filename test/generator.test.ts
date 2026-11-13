@@ -30,6 +30,7 @@ describe("generateOperations", () => {
       method: "POST",
       path: "/v3/application/shops/{shop_id}/listings",
       scopes: ["listings_w"],
+      oauth2: true,
       write: true,
       toolset: "listings",
       params: [
@@ -42,6 +43,15 @@ describe("generateOperations", () => {
   it("marks GET as non-write with no scopes when public", () => {
     const [op] = generateOperations(spec({ "/a": { get: { operationId: "getA", tags: TAGS } } }));
     expect(op.write).toBe(false);
+    expect(op.scopes).toEqual([]);
+    expect(op.oauth2).toBe(false);
+  });
+
+  it("flags oauth2 from the security requirement even without scopes", () => {
+    const [op] = generateOperations(
+      spec({ "/a": { get: { operationId: "getA", tags: TAGS, security: [{ api_key: [], oauth2: [] }] } } }),
+    );
+    expect(op.oauth2).toBe(true);
     expect(op.scopes).toEqual([]);
   });
 

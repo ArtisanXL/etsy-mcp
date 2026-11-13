@@ -1,22 +1,35 @@
+import { defaultConfigDir } from "./token-store.js";
 import { TOOLSETS, type Toolset } from "./operation.js";
 
 export interface Config {
   apiKey: string;
   sharedSecret: string;
-  accessToken?: string;
+  /** Seeds the token store (ETSY_REFRESH_TOKEN). */
+  refreshToken?: string;
+  /** Directory holding tokens.json. */
+  configDir: string;
   /** Enabled Toolsets; undefined means all. */
   toolsets?: Toolset[];
 }
 
-export function loadConfig(env: Record<string, string | undefined>): Config {
+export function loadConfig(
+  env: Record<string, string | undefined>,
+  warn: (message: string) => void = (m) => console.error(`etsy-mcp: ${m}`),
+): Config {
   const apiKey = env.ETSY_API_KEY;
   const sharedSecret = env.ETSY_SHARED_SECRET;
   if (!apiKey) throw new Error("ETSY_API_KEY environment variable is required");
   if (!sharedSecret) throw new Error("ETSY_SHARED_SECRET environment variable is required");
+  if (env.ETSY_ACCESS_TOKEN) {
+    warn(
+      "ETSY_ACCESS_TOKEN is no longer used and is ignored. Run `npx @artisanxl/etsy-mcp login`, or set ETSY_REFRESH_TOKEN.",
+    );
+  }
   return {
     apiKey,
     sharedSecret,
-    accessToken: env.ETSY_ACCESS_TOKEN || undefined,
+    refreshToken: env.ETSY_REFRESH_TOKEN || undefined,
+    configDir: defaultConfigDir(),
     toolsets: parseToolsets(env.ETSY_TOOLSETS),
   };
 }
