@@ -3,33 +3,29 @@ import { loadConfig } from "../src/config.js";
 import { connect } from "./harness.js";
 
 describe("tools/list", () => {
-  it("lists the 5 tools", async () => {
+  it("lists the 64 generated read tools with spec descriptions", async () => {
     const { client } = await connect();
     const { tools } = await client.listTools();
-    expect(tools.map((t) => t.name).sort()).toEqual([
-      "find_shops",
-      "get_listing",
-      "get_shop",
-      "get_shop_listings",
-      "search_listings",
-    ]);
+    expect(tools).toHaveLength(64);
+    const names = tools.map((t) => t.name);
+    expect(names).toContain("get_listing");
+    expect(names).not.toContain("search_listings");
+    expect(names).not.toContain("create_draft_listing");
+    expect(tools.find((t) => t.name === "get_listing")?.description).toContain(
+      "Retrieves a listing record by listing ID",
+    );
   });
 });
 
 describe("tools/call", () => {
   const cases: [string, Record<string, unknown>, string][] = [
-    ["get_shop", { shop_id: 12 }, "/v3/application/shops/12"],
-    ["find_shops", { shop_name: "x y", limit: 5 }, "/v3/application/shops?shop_name=x+y&limit=5"],
     ["get_listing", { listing_id: 7 }, "/v3/application/listings/7"],
+    ["get_listing", { listing_id: 7, language: "de" }, "/v3/application/listings/7?language=de"],
+    ["find_shops", { shop_name: "x y", limit: 5 }, "/v3/application/shops?shop_name=x+y&limit=5"],
     [
-      "search_listings",
-      { keywords: "mug", limit: 2, offset: 4 },
-      "/v3/application/listings/active?keywords=mug&limit=2&offset=4",
-    ],
-    [
-      "get_shop_listings",
-      { shop_id: 3, limit: 1 },
-      "/v3/application/shops/3/listings/active?limit=1",
+      "get_listings_by_shop",
+      { shop_id: 3, limit: 1, offset: 2 },
+      "/v3/application/shops/3/listings?limit=1&offset=2",
     ],
   ];
 

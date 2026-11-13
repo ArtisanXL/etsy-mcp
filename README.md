@@ -32,11 +32,7 @@ claude mcp add etsy -e ETSY_API_KEY=your-keystring -e ETSY_SHARED_SECRET=your-sh
 
 ## Tools
 
-- `get_shop` — shop by `shop_id`
-- `find_shops` — search shops by name
-- `get_listing` — listing by `listing_id`
-- `search_listings` — search active listings
-- `get_shop_listings` — active listings of a shop
+One Tool per Etsy Open API v3 GET Operation (64), named as the snake_case `operationId` (e.g. `get_listing`, `get_listings_by_shop`) and generated from the committed spec in `spec/`. Array query parameters are not yet supported. Regenerate with `npm run gen:local`.
 
 ## Development
 
