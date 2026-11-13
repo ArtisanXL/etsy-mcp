@@ -22,6 +22,22 @@ export const operations: OperationDescriptor[] = [
         "type": "integer",
         "description": "The unique positive non-zero numeric ID for an Etsy Shop.",
         "minimum": 1
+      },
+      {
+        "name": "source_return_policy_id",
+        "in": "body-form",
+        "required": true,
+        "type": "integer",
+        "description": "The numeric ID of the [Return Policy](/documentation/reference#operation/getShopReturnPolicies).",
+        "minimum": 1
+      },
+      {
+        "name": "destination_return_policy_id",
+        "in": "body-form",
+        "required": true,
+        "type": "integer",
+        "description": "The numeric ID of the [Return Policy](/documentation/reference#operation/getShopReturnPolicies).",
+        "minimum": 1
       }
     ]
   },
@@ -45,6 +61,384 @@ export const operations: OperationDescriptor[] = [
         "type": "integer",
         "description": "The unique positive non-zero numeric ID for an Etsy Shop.",
         "minimum": 1
+      },
+      {
+        "name": "quantity",
+        "in": "body-form",
+        "required": true,
+        "type": "integer",
+        "description": "The positive non-zero number of products available for purchase in the listing. Note: The listing quantity is the sum of available offering quantities. You can request the quantities for individual offerings from the ListingInventory resource using the [getListingInventory](/documentation/reference#operation/getListingInventory) endpoint."
+      },
+      {
+        "name": "title",
+        "in": "body-form",
+        "required": true,
+        "type": "string",
+        "description": "The listing's title string. When creating or updating a listing, valid title strings contain only letters, numbers, punctuation marks, mathematical symbols, whitespace characters, ™, ©, and ®. (regex: /[^\\p{L}\\p{Nd}\\p{P}\\p{Sm}\\p{Zs}™©®]/u) You can only use the %, :, & and + characters once each."
+      },
+      {
+        "name": "description",
+        "in": "body-form",
+        "required": true,
+        "type": "string",
+        "description": "A description string of the product for sale in the listing."
+      },
+      {
+        "name": "price",
+        "in": "body-form",
+        "required": true,
+        "type": "number",
+        "description": "The positive non-zero price of the product. (Sold product listings are private) Note: The price is the minimum possible price. The [`getListingInventory`](/documentation/reference/#operation/getListingInventory) method requests exact prices for available offerings."
+      },
+      {
+        "name": "who_made",
+        "in": "body-form",
+        "required": true,
+        "type": "string",
+        "description": "An enumerated string indicating who made the product. Helps buyers locate the listing under the Handmade heading. Requires 'is_supply' and 'when_made'.",
+        "enum": [
+          "i_did",
+          "someone_else",
+          "collective"
+        ]
+      },
+      {
+        "name": "when_made",
+        "in": "body-form",
+        "required": true,
+        "type": "string",
+        "description": "An enumerated string for the era in which the maker made the product in this listing. Helps buyers locate the listing under the Vintage heading. Requires 'is_supply' and 'who_made'.",
+        "enum": [
+          "made_to_order",
+          "2020_2026",
+          "2010_2019",
+          "2007_2009",
+          "before_2007",
+          "2000_2006",
+          "1990s",
+          "1980s",
+          "1970s",
+          "1960s",
+          "1950s",
+          "1940s",
+          "1930s",
+          "1920s",
+          "1910s",
+          "1900s",
+          "1800s",
+          "1700s",
+          "before_1700"
+        ]
+      },
+      {
+        "name": "taxonomy_id",
+        "in": "body-form",
+        "required": true,
+        "type": "integer",
+        "description": "The numerical taxonomy ID of the listing. See [SellerTaxonomy](/documentation/reference#tag/SellerTaxonomy) and [BuyerTaxonomy](/documentation/reference#tag/BuyerTaxonomy) for more information.",
+        "minimum": 1
+      },
+      {
+        "name": "shipping_profile_id",
+        "in": "body-form",
+        "required": false,
+        "type": "integer",
+        "description": "The numeric ID of the [shipping profile](/documentation/reference#operation/getShopShippingProfile) associated with the listing. Required when listing type is `physical`.",
+        "minimum": 1
+      },
+      {
+        "name": "return_policy_id",
+        "in": "body-form",
+        "required": false,
+        "type": "integer",
+        "description": "The numeric ID of the [Return Policy](/documentation/reference#operation/getShopReturnPolicies).",
+        "minimum": 1
+      },
+      {
+        "name": "materials",
+        "in": "body-form",
+        "required": false,
+        "type": "array",
+        "description": "A list of material strings for materials used in the product. Valid materials strings contain only letters, numbers, and whitespace characters. (regex: /[^\\p{L}\\p{Nd}\\p{Zs}]/u) Default value is null.",
+        "items": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "shop_section_id",
+        "in": "body-form",
+        "required": false,
+        "type": "integer",
+        "description": "The numeric ID of the [shop section](/documentation/reference#tag/Shop-Section) for this listing. Default value is null.",
+        "minimum": 1
+      },
+      {
+        "name": "processing_min",
+        "in": "body-form",
+        "required": false,
+        "type": "integer",
+        "description": "The minimum number of days required to process this listing. Default value is null."
+      },
+      {
+        "name": "processing_max",
+        "in": "body-form",
+        "required": false,
+        "type": "integer",
+        "description": "The maximum number of days required to process this listing. Default value is null."
+      },
+      {
+        "name": "readiness_state_id",
+        "in": "body-form",
+        "required": false,
+        "type": "integer",
+        "description": "The numeric ID of the [processing profile](/documentation/reference#operation/getShopReadinessStateDefinition) associated with the listing. Returned only when the listing is `active` and of type `physical`, and the endpoint is either shop-scoped (path contains `shop_id`) or a single-listing request such as `getListing`. For every other case this field can be null.",
+        "minimum": 1
+      },
+      {
+        "name": "tags",
+        "in": "body-form",
+        "required": false,
+        "type": "array",
+        "description": "A comma-separated list of tag strings for the listing. When creating or updating a listing, valid tag strings contain only letters, numbers, whitespace characters, -, ', ™, ©, and ®. (regex: /[^\\p{L}\\p{Nd}\\p{Zs}\\-'™©®]/u) Default value is null.",
+        "items": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "styles",
+        "in": "body-form",
+        "required": false,
+        "type": "array",
+        "description": "An array of style strings for this listing, each of which is free-form text string such as \"Formal\", or \"Steampunk\". When creating or updating a listing, the listing may have up to two styles. Valid style strings contain only letters, numbers, and whitespace characters. (regex: /[^\\p{L}\\p{Nd}\\p{Zs}]/u) Each style string is limited to 45 characters. Default value is null.",
+        "items": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "item_weight",
+        "in": "body-form",
+        "required": false,
+        "type": "number",
+        "description": "The numeric weight of the product measured in units set in 'item_weight_unit'. Default value is null. If set, the value must be greater than 0.",
+        "minimum": 0,
+        "maximum": 1.79769313486e+308
+      },
+      {
+        "name": "item_length",
+        "in": "body-form",
+        "required": false,
+        "type": "number",
+        "description": "The numeric length of the product measured in units set in 'item_dimensions_unit'. Default value is null. If set, the value must be greater than 0.",
+        "minimum": 0,
+        "maximum": 1.79769313486e+308
+      },
+      {
+        "name": "item_width",
+        "in": "body-form",
+        "required": false,
+        "type": "number",
+        "description": "The numeric width of the product measured in units set in 'item_dimensions_unit'. Default value is null. If set, the value must be greater than 0.",
+        "minimum": 0,
+        "maximum": 1.79769313486e+308
+      },
+      {
+        "name": "item_height",
+        "in": "body-form",
+        "required": false,
+        "type": "number",
+        "description": "The numeric height of the product measured in units set in 'item_dimensions_unit'. Default value is null. If set, the value must be greater than 0.",
+        "minimum": 0,
+        "maximum": 1.79769313486e+308
+      },
+      {
+        "name": "item_weight_unit",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "A string defining the units used to measure the weight of the product. Default value is null.",
+        "enum": [
+          "oz",
+          "lb",
+          "g",
+          "kg"
+        ]
+      },
+      {
+        "name": "item_dimensions_unit",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "A string defining the units used to measure the dimensions of the product. Default value is null.",
+        "enum": [
+          "in",
+          "ft",
+          "mm",
+          "cm",
+          "m",
+          "yd",
+          "inches"
+        ]
+      },
+      {
+        "name": "production_partner_ids",
+        "in": "body-form",
+        "required": false,
+        "type": "array",
+        "description": "An array of unique IDs of production partner ids.",
+        "items": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      {
+        "name": "image_ids",
+        "in": "body-form",
+        "required": false,
+        "type": "array",
+        "description": "An array of numeric image IDs of the images in a listing, which can include up to 20 images.",
+        "items": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      {
+        "name": "ecgt_garan_brand",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "The brand or trademark name for the EU commercial guarantee (required under GPSR/ECGT for eligible EU traders). Maximum 25 characters. See the [Etsy Seller Handbook](https://help.etsy.com/hc/articles/43191692248343) for details. If any one of ecgt_garan_brand, ecgt_garan_model, ecgt_garan_years, or ecgt_garan_guarantee_details is provided and non-empty, all four are required. Silently ignored for digital listings and for sellers who are not eligible EU traders."
+      },
+      {
+        "name": "ecgt_garan_years",
+        "in": "body-form",
+        "required": false,
+        "type": "integer",
+        "description": "Duration of the EU commercial guarantee in whole years (minimum 3, maximum 99). Required together with ecgt_garan_brand, ecgt_garan_model, and ecgt_garan_guarantee_details. Silently ignored for digital listings and for sellers who are not eligible EU traders."
+      },
+      {
+        "name": "ecgt_garan_model",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "The product model or reference number for the EU commercial guarantee label. Maximum 20 characters. Required together with ecgt_garan_brand, ecgt_garan_years, and ecgt_garan_guarantee_details. Silently ignored for digital listings and for sellers who are not eligible EU traders."
+      },
+      {
+        "name": "ecgt_garan_guarantee_details",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "Free-text description of the EU commercial guarantee terms and coverage. Maximum 255 characters. Required together with ecgt_garan_brand, ecgt_garan_model, and ecgt_garan_years. Silently ignored for digital listings and for sellers who are not eligible EU traders."
+      },
+      {
+        "name": "ecgt_other_commercial_guarantee_details",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "Free-text details of any additional commercial guarantee or warranty beyond the primary EU commercial guarantee. Maximum 255 characters. Silently ignored for digital listings and for sellers who are not eligible EU traders."
+      },
+      {
+        "name": "ecgt_after_sales_service_info",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "After-sales service, repairability, or eco-friendly delivery information required under EU GPSR/ECGT regulations. Maximum 255 characters. Silently ignored for digital listings and for sellers who are not eligible EU traders."
+      },
+      {
+        "name": "ecgt_software_update_details",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "Details of software update availability and the duration of such updates, as required under EU ECGT regulations for digital content. Maximum 255 characters. Silently ignored for physical listings and for sellers who are not eligible EU traders."
+      },
+      {
+        "name": "gpsr_manufacturer_type",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "Who the manufacturer of this product is, for GPSR (EU General Product Safety Regulation) purposes. Either `seller` (your shop is the manufacturer) or `economic_operator` (a manufacturer record from the [Shop Economic Operators](/documentation/reference#tag/Shop-Economic-Operators) endpoints, identified by `gpsr_manufacturer_id`). `seller` is rejected when `who_made` is `someone_else`; use `economic_operator` for items made by a third party. Send `null` to clear. Optional for now; it becomes required for listings from eligible traders that sell into the EU 60 days after these fields were announced. See the [GPSR Economic Operators Tutorial](/documentation/tutorials/gpsr-economic-operators) for eligibility and the full flow.",
+        "enum": [
+          "seller",
+          "economic_operator"
+        ]
+      },
+      {
+        "name": "gpsr_manufacturer_id",
+        "in": "body-form",
+        "required": false,
+        "type": "integer",
+        "description": "The `economic_operator_id` of the manufacturer, from the [Shop Economic Operators](/documentation/reference#tag/Shop-Economic-Operators) endpoints. Required when `gpsr_manufacturer_type` is `economic_operator`, and rejected when the type is anything else. The operator must belong to this shop and not be deleted. The manufacturer may be located anywhere in the world. If you change `gpsr_manufacturer_type` to `seller` without sending this field, the stored id is cleared for you."
+      },
+      {
+        "name": "gpsr_responsible_person_type",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "Who the EU responsible person for this product is, for GPSR purposes. Either `seller` (your shop; only valid when the shop's legal address, or the address on file, is in the European Union) or `economic_operator` (a record from the [Shop Economic Operators](/documentation/reference#tag/Shop-Economic-Operators) endpoints, identified by `gpsr_responsible_person_id`, which must have an address in the European Union). Send `null` to clear. Optional for now; it becomes required for listings from eligible traders that sell into the EU 60 days after these fields were announced. See the [GPSR Economic Operators Tutorial](/documentation/tutorials/gpsr-economic-operators) for eligibility and the full flow.",
+        "enum": [
+          "seller",
+          "economic_operator"
+        ]
+      },
+      {
+        "name": "gpsr_responsible_person_id",
+        "in": "body-form",
+        "required": false,
+        "type": "integer",
+        "description": "The `economic_operator_id` of the EU responsible person, from the [Shop Economic Operators](/documentation/reference#tag/Shop-Economic-Operators) endpoints. Required when `gpsr_responsible_person_type` is `economic_operator`, and rejected when the type is anything else. The operator must belong to this shop and not be deleted, and its address must be in the European Union. If you change `gpsr_responsible_person_type` to `seller` without sending this field, the stored id is cleared for you."
+      },
+      {
+        "name": "gpsr_serial_number",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "An optional serial number, batch number, or lot identifier that lets the product be traced for GPSR purposes. Maximum 255 characters. Send `null` to clear."
+      },
+      {
+        "name": "gpsr_safety_warnings",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "Optional free-text safety warnings and safety information for the product regarding GPSR purposes, shown to buyers as product safety information on the listing page (for example age restrictions, choking hazards, or care and handling instructions). Maximum 102,400 characters. Send `null` to clear."
+      },
+      {
+        "name": "is_supply",
+        "in": "body-form",
+        "required": false,
+        "type": "boolean",
+        "description": "When true, tags the listing as a supply product, else indicates that it's a finished product. Helps buyers locate the listing under the Supplies heading. Requires 'who_made' and 'when_made'."
+      },
+      {
+        "name": "is_customizable",
+        "in": "body-form",
+        "required": false,
+        "type": "boolean",
+        "description": "When true, a buyer may contact the seller for a customized order. The default value is true when a shop accepts custom orders. Does not apply to shops that do not accept custom orders."
+      },
+      {
+        "name": "should_auto_renew",
+        "in": "body-form",
+        "required": false,
+        "type": "boolean",
+        "description": "When true, renews a listing for four months upon expiration."
+      },
+      {
+        "name": "is_taxable",
+        "in": "body-form",
+        "required": false,
+        "type": "boolean",
+        "description": "When true, applicable [shop](/documentation/reference#tag/Shop) tax rates apply to this listing at checkout."
+      },
+      {
+        "name": "type",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "An enumerated type string that indicates whether the listing is physical or a digital download.",
+        "enum": [
+          "physical",
+          "download",
+          "both"
+        ]
       }
     ]
   },
@@ -83,6 +477,30 @@ export const operations: OperationDescriptor[] = [
         "required": true,
         "type": "string",
         "description": "The IETF language tag for the language of this translation. Ex: `de`, `en`, `es`, `fr`, `it`, `ja`, `nl`, `pl`, `pt`."
+      },
+      {
+        "name": "title",
+        "in": "body-form",
+        "required": true,
+        "type": "string",
+        "description": "The title of the Listing of this Translation."
+      },
+      {
+        "name": "description",
+        "in": "body-form",
+        "required": true,
+        "type": "string",
+        "description": "The description of the Listing of this Translation."
+      },
+      {
+        "name": "tags",
+        "in": "body-form",
+        "required": false,
+        "type": "array",
+        "description": "The tags of the Listing of this Translation.",
+        "items": {
+          "type": "string"
+        }
       }
     ]
   },
@@ -121,6 +539,176 @@ export const operations: OperationDescriptor[] = [
         "required": false,
         "type": "boolean",
         "description": "This parameter needed to enable new parameters and response values related to processing profiles."
+      },
+      {
+        "name": "tracking_code",
+        "in": "body-json",
+        "required": false,
+        "type": "string",
+        "description": "The tracking code for this receipt."
+      },
+      {
+        "name": "carrier_name",
+        "in": "body-json",
+        "required": false,
+        "type": "string",
+        "description": "The carrier name for this receipt."
+      },
+      {
+        "name": "send_bcc",
+        "in": "body-json",
+        "required": false,
+        "type": "boolean",
+        "description": "If true, the shipping notification will be sent to the seller as well"
+      },
+      {
+        "name": "note_to_buyer",
+        "in": "body-json",
+        "required": false,
+        "type": "string",
+        "description": "Message to include in notification to the buyer."
+      },
+      {
+        "name": "mail_class",
+        "in": "body-json",
+        "required": false,
+        "type": "string",
+        "description": "The service level of postal or carrier service selected for the shipment (e.g., First-Class, Priority, Ground, Express)."
+      },
+      {
+        "name": "weight",
+        "in": "body-json",
+        "required": false,
+        "type": "number",
+        "description": "The total weight of the package."
+      },
+      {
+        "name": "weight_units",
+        "in": "body-json",
+        "required": false,
+        "type": "string",
+        "description": "Unit of measurement used for package weight (oz, grams, etc.)."
+      },
+      {
+        "name": "length",
+        "in": "body-json",
+        "required": false,
+        "type": "number",
+        "description": "Longest side of the package."
+      },
+      {
+        "name": "width",
+        "in": "body-json",
+        "required": false,
+        "type": "number",
+        "description": "Second longest side of the package."
+      },
+      {
+        "name": "height",
+        "in": "body-json",
+        "required": false,
+        "type": "number",
+        "description": "Third longest side of the package."
+      },
+      {
+        "name": "dimension_units",
+        "in": "body-json",
+        "required": false,
+        "type": "string",
+        "description": "Unit of measurement used for package dimensions (in, cm...)."
+      },
+      {
+        "name": "shipping_label_cost",
+        "in": "body-json",
+        "required": false,
+        "type": "number",
+        "description": "The purchase price the seller paid for the shipping label."
+      },
+      {
+        "name": "shipping_label_currency",
+        "in": "body-json",
+        "required": false,
+        "type": "string",
+        "description": "The currency in which the shipping label was purchased."
+      },
+      {
+        "name": "revenue_eligibility",
+        "in": "body-json",
+        "required": false,
+        "type": "string",
+        "description": "A flag indicating if the shipment is tied to a revenue share agreement between Etsy and the vendor."
+      },
+      {
+        "name": "ship_from_country",
+        "in": "body-json",
+        "required": false,
+        "type": "string",
+        "description": "Where the package ships from."
+      },
+      {
+        "name": "ship_to_country",
+        "in": "body-json",
+        "required": false,
+        "type": "string",
+        "description": "Package destination."
+      },
+      {
+        "name": "incoterm",
+        "in": "body-json",
+        "required": false,
+        "type": "string",
+        "description": "The specific incoterm (e.g., DDU, DDP) designated for the shipment."
+      },
+      {
+        "name": "customs_data",
+        "in": "body-json",
+        "required": false,
+        "type": "array",
+        "description": "Contains custom data like country of origin, declared value and HS code.",
+        "items": {
+          "type": "object",
+          "properties": [
+            {
+              "name": "country_of_origin",
+              "required": false,
+              "type": "string",
+              "description": "The country in which the goods originate from."
+            },
+            {
+              "name": "declared_value",
+              "required": false,
+              "type": "number",
+              "description": "The commercial value of the goods."
+            },
+            {
+              "name": "HS_code",
+              "required": false,
+              "type": "string",
+              "description": "The standardized global system (Harmonized System) for classifying traded products."
+            }
+          ]
+        }
+      },
+      {
+        "name": "duty_amount",
+        "in": "body-json",
+        "required": false,
+        "type": "number",
+        "description": "The estimated or actual amount of import duties and taxes assessed by customs for the shipment."
+      },
+      {
+        "name": "duty_currency",
+        "in": "body-json",
+        "required": false,
+        "type": "string",
+        "description": "The currency in which the duty was paid."
+      },
+      {
+        "name": "ship_date",
+        "in": "body-json",
+        "required": false,
+        "type": "string",
+        "description": "The date package was shipped."
       }
     ]
   },
@@ -144,6 +732,83 @@ export const operations: OperationDescriptor[] = [
         "type": "integer",
         "description": "The unique positive non-zero numeric ID for an Etsy Shop.",
         "minimum": 1
+      },
+      {
+        "name": "operator_name",
+        "in": "body-form",
+        "required": true,
+        "type": "string",
+        "description": "The legal or trading name of the business or individual acting as economic operator, as it should be shown to buyers and market surveillance authorities. Required, cannot be blank. Maximum 50 characters."
+      },
+      {
+        "name": "email",
+        "in": "body-form",
+        "required": true,
+        "type": "string",
+        "description": "The contact email address of the economic operator, where buyers and authorities can reach it about product safety. Required and must be a valid email address. Maximum 255 characters."
+      },
+      {
+        "name": "first_line",
+        "in": "body-form",
+        "required": true,
+        "type": "string",
+        "description": "The first line of the economic operator's postal address (street and number). Required, cannot be blank. Maximum 50 characters (95 in a few countries, such as India, Brazil, and Japan)."
+      },
+      {
+        "name": "city",
+        "in": "body-form",
+        "required": true,
+        "type": "string",
+        "description": "The city or town of the economic operator's postal address. Required, cannot be blank. Maximum 50 characters (95 in a few countries, such as India, Brazil, and Japan)."
+      },
+      {
+        "name": "zip",
+        "in": "body-form",
+        "required": true,
+        "type": "string",
+        "description": "The postal code of the economic operator's postal address. Required, cannot be blank."
+      },
+      {
+        "name": "country_iso",
+        "in": "body-form",
+        "required": true,
+        "type": "string",
+        "description": "The ISO 3166-1 alpha-2 code of the country of the economic operator's postal address, for example `DE` or `FR`. Not case-sensitive on input; always returned in upper case. Required."
+      },
+      {
+        "name": "phone",
+        "in": "body-form",
+        "required": true,
+        "type": "string",
+        "description": "The contact phone number of the economic operator. Required, cannot be blank. May contain digits, spaces, and the characters ( ) . - + #. Phone number must be valid."
+      },
+      {
+        "name": "second_line",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "The second line of the economic operator's postal address (apartment, suite, building). Optional. Maximum 50 characters (95 in a few countries, such as India, Brazil, and Japan). Send `null` on update to clear it. Returned as `null` when not set."
+      },
+      {
+        "name": "state",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "The state, province, or region of the economic operator's postal address. Required if the `country_iso` requires a state; optional otherwise. Maximum 50 characters (95 in a few countries, such as India, Brazil, and Japan). See the [list of countries](/documentation/tutorials/gpsr-economic-operators#countries-requiring-a-state). On update, send `null` to clear it (not allowed for those countries). Returned as `null` when not set."
+      },
+      {
+        "name": "phone_country_iso",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "The ISO 3166-1 alpha-2 country code that `phone` belongs to, for example `DE`. Optional. Not case-sensitive on input; always returned in upper case."
+      },
+      {
+        "name": "trademark_name",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "The brand or trademark the economic operator trades under, when it differs from `operator_name`. Optional. Maximum 255 characters. Send `null` on update to clear it. Returned as `null` when not set."
       }
     ]
   },
@@ -167,6 +832,46 @@ export const operations: OperationDescriptor[] = [
         "type": "integer",
         "description": "The unique positive non-zero numeric ID for an Etsy Shop.",
         "minimum": 1
+      },
+      {
+        "name": "readiness_state",
+        "in": "body-form",
+        "required": true,
+        "type": "string",
+        "description": "The readiness state of a product: \\\"1\\\" means \\\"ready_to_ship\\\", and \\\"2\\\" means \\\"made_to_order\\\"",
+        "enum": [
+          "ready_to_ship",
+          "made_to_order"
+        ]
+      },
+      {
+        "name": "min_processing_time",
+        "in": "body-form",
+        "required": true,
+        "type": "integer",
+        "description": "The minimum number of days or weeks for processing a specific product.",
+        "minimum": 1,
+        "maximum": 10
+      },
+      {
+        "name": "max_processing_time",
+        "in": "body-form",
+        "required": true,
+        "type": "integer",
+        "description": "The maximum number of days or weeks for processing a specific product.",
+        "minimum": 1,
+        "maximum": 10
+      },
+      {
+        "name": "processing_time_unit",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "The unit used to represent how long a processing time is. A week is equivalent to how many days the seller works per week as stated in their processing schedule. If none is provided, the unit is set to \\\"days\\\".",
+        "enum": [
+          "days",
+          "weeks"
+        ]
       }
     ]
   },
@@ -190,6 +895,25 @@ export const operations: OperationDescriptor[] = [
         "type": "integer",
         "description": "The unique positive non-zero numeric ID for an Etsy Shop.",
         "minimum": 1
+      },
+      {
+        "name": "accepts_returns",
+        "in": "body-form",
+        "required": true,
+        "type": "boolean"
+      },
+      {
+        "name": "accepts_exchanges",
+        "in": "body-form",
+        "required": true,
+        "type": "boolean"
+      },
+      {
+        "name": "return_deadline",
+        "in": "body-form",
+        "required": false,
+        "type": "integer",
+        "description": "The deadline for the Return Policy, measured in days. The value must be one of the following: [7, 14, 21, 30, 45, 60, 90]."
       }
     ]
   },
@@ -213,6 +937,13 @@ export const operations: OperationDescriptor[] = [
         "type": "integer",
         "description": "The unique positive non-zero numeric ID for an Etsy Shop.",
         "minimum": 1
+      },
+      {
+        "name": "title",
+        "in": "body-form",
+        "required": true,
+        "type": "string",
+        "description": "The title string for a shop section."
       }
     ]
   },
@@ -236,6 +967,124 @@ export const operations: OperationDescriptor[] = [
         "type": "integer",
         "description": "The unique positive non-zero numeric ID for an Etsy Shop.",
         "minimum": 1
+      },
+      {
+        "name": "title",
+        "in": "body-form",
+        "required": true,
+        "type": "string",
+        "description": "The name string of this shipping profile."
+      },
+      {
+        "name": "origin_country_iso",
+        "in": "body-form",
+        "required": true,
+        "type": "string",
+        "description": "The ISO code of the country from which the listing ships."
+      },
+      {
+        "name": "primary_cost",
+        "in": "body-form",
+        "required": true,
+        "type": "number",
+        "description": "The cost of shipping to this country/region alone, measured in the store's default currency.",
+        "minimum": 0
+      },
+      {
+        "name": "secondary_cost",
+        "in": "body-form",
+        "required": true,
+        "type": "number",
+        "description": "The cost of shipping to this country/region with another item, measured in the store's default currency.",
+        "minimum": 0
+      },
+      {
+        "name": "min_processing_time",
+        "in": "body-form",
+        "required": false,
+        "type": "integer",
+        "description": "The minimum time required to process to ship listings with this shipping profile.",
+        "minimum": 1,
+        "maximum": 10
+      },
+      {
+        "name": "max_processing_time",
+        "in": "body-form",
+        "required": false,
+        "type": "integer",
+        "description": "The maximum processing time the listing needs to ship.",
+        "minimum": 1,
+        "maximum": 10
+      },
+      {
+        "name": "processing_time_unit",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "The unit used to represent how long a processing time is. A week is equivalent to the set processing schedule (default to 5 business days). If none is provided, the unit is set to \"business_days\".",
+        "enum": [
+          "business_days",
+          "weeks"
+        ]
+      },
+      {
+        "name": "destination_country_iso",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "The ISO code of the country to which the listing ships. If null, request sets destination to destination_region. Required if destination_region is null or not provided."
+      },
+      {
+        "name": "destination_region",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "The code of the region to which the listing ships. A region represents a set of countries. Supported regions are Europe Union and Non-Europe Union (countries in Europe not in EU). If `none`, request sets destination to destination_country_iso. Required if destination_country_iso is null or not provided.",
+        "enum": [
+          "eu",
+          "non_eu",
+          "none"
+        ]
+      },
+      {
+        "name": "origin_postal_code",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "The postal code string (not necessarily a number) for the location from which the listing ships. Required if the `origin_country_iso` supports postal codes. See the [Fulfillment Tutorial docs](https://developer.etsy.com/documentation/tutorials/fulfillment/#countries-requiring-postal-codes) for more info"
+      },
+      {
+        "name": "shipping_carrier_id",
+        "in": "body-form",
+        "required": false,
+        "type": "integer",
+        "description": "The unique ID of a supported shipping carrier, which is used to calculate an Estimated Delivery Date. **Required with `mail_class`** if `min_delivery_days` and `max_delivery_days` are null.",
+        "minimum": 0
+      },
+      {
+        "name": "mail_class",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "The unique ID string of a shipping carrier's mail class, which is used to calculate an estimated delivery date. **Required with `shipping_carrier_id`** if `min_delivery_days` and `max_delivery_days` are null."
+      },
+      {
+        "name": "min_delivery_days",
+        "in": "body-form",
+        "required": false,
+        "type": "integer",
+        "description": "The minimum number of business days a buyer can expect to wait to receive their purchased item once it has shipped. **Required with `max_delivery_days`** if `mail_class` is null.",
+        "minimum": 1,
+        "maximum": 45
+      },
+      {
+        "name": "max_delivery_days",
+        "in": "body-form",
+        "required": false,
+        "type": "integer",
+        "description": "The maximum number of business days a buyer can expect to wait to receive their purchased item once it has shipped. **Required with `min_delivery_days`** if `mail_class` is null.",
+        "minimum": 1,
+        "maximum": 45
       }
     ]
   },
@@ -267,6 +1116,74 @@ export const operations: OperationDescriptor[] = [
         "type": "integer",
         "description": "The numeric ID of the [shipping profile](/documentation/reference#operation/getShopShippingProfile) associated with the listing. Required when listing type is `physical`.",
         "minimum": 1
+      },
+      {
+        "name": "primary_cost",
+        "in": "body-form",
+        "required": true,
+        "type": "number",
+        "description": "The cost of shipping to this country/region alone, measured in the store's default currency.",
+        "minimum": 0
+      },
+      {
+        "name": "secondary_cost",
+        "in": "body-form",
+        "required": true,
+        "type": "number",
+        "description": "The cost of shipping to this country/region with another item, measured in the store's default currency.",
+        "minimum": 0
+      },
+      {
+        "name": "destination_country_iso",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "The ISO code of the country to which the listing ships. If null, request sets destination to destination_region. Required if destination_region is null or not provided."
+      },
+      {
+        "name": "destination_region",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "The code of the region to which the listing ships. A region represents a set of countries. Supported regions are Europe Union and Non-Europe Union (countries in Europe not in EU). If `none`, request sets destination to destination_country_iso. Required if destination_country_iso is null or not provided.",
+        "enum": [
+          "eu",
+          "non_eu",
+          "none"
+        ]
+      },
+      {
+        "name": "shipping_carrier_id",
+        "in": "body-form",
+        "required": false,
+        "type": "integer",
+        "description": "The unique ID of a supported shipping carrier, which is used to calculate an Estimated Delivery Date. **Required with `mail_class`** if `min_delivery_days` and `max_delivery_days` are null.",
+        "minimum": 0
+      },
+      {
+        "name": "mail_class",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "The unique ID string of a shipping carrier's mail class, which is used to calculate an estimated delivery date. **Required with `shipping_carrier_id`** if `min_delivery_days` and `max_delivery_days` are null."
+      },
+      {
+        "name": "min_delivery_days",
+        "in": "body-form",
+        "required": false,
+        "type": "integer",
+        "description": "The minimum number of business days a buyer can expect to wait to receive their purchased item once it has shipped. **Required with `max_delivery_days`** if `mail_class` is null.",
+        "minimum": 1,
+        "maximum": 45
+      },
+      {
+        "name": "max_delivery_days",
+        "in": "body-form",
+        "required": false,
+        "type": "integer",
+        "description": "The maximum number of business days a buyer can expect to wait to receive their purchased item once it has shipped. **Required with `min_delivery_days`** if `mail_class` is null.",
+        "minimum": 1,
+        "maximum": 45
       }
     ]
   },
@@ -298,6 +1215,73 @@ export const operations: OperationDescriptor[] = [
         "type": "integer",
         "description": "The numeric ID of the [shipping profile](/documentation/reference#operation/getShopShippingProfile) associated with the listing. Required when listing type is `physical`.",
         "minimum": 1
+      },
+      {
+        "name": "type",
+        "in": "body-form",
+        "required": true,
+        "type": "integer",
+        "description": "The type of the shipping upgrade. Domestic (0) or international (1).",
+        "enum": [
+          0,
+          1
+        ]
+      },
+      {
+        "name": "upgrade_name",
+        "in": "body-form",
+        "required": true,
+        "type": "string",
+        "description": "Name for the shipping upgrade shown to shoppers at checkout, e.g. USPS Priority."
+      },
+      {
+        "name": "price",
+        "in": "body-form",
+        "required": true,
+        "type": "number",
+        "description": "Additional cost of adding the shipping upgrade.",
+        "minimum": 0
+      },
+      {
+        "name": "secondary_price",
+        "in": "body-form",
+        "required": true,
+        "type": "number",
+        "description": "Additional cost of adding the shipping upgrade for each additional item.",
+        "minimum": 0
+      },
+      {
+        "name": "shipping_carrier_id",
+        "in": "body-form",
+        "required": false,
+        "type": "integer",
+        "description": "The unique ID of a supported shipping carrier, which is used to calculate an Estimated Delivery Date. **Required with `mail_class`** if `min_delivery_days` and `max_delivery_days` are null.",
+        "minimum": 0
+      },
+      {
+        "name": "mail_class",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "The unique ID string of a shipping carrier's mail class, which is used to calculate an estimated delivery date. **Required with `shipping_carrier_id`** if `min_delivery_days` and `max_delivery_days` are null."
+      },
+      {
+        "name": "min_delivery_days",
+        "in": "body-form",
+        "required": false,
+        "type": "integer",
+        "description": "The minimum number of business days a buyer can expect to wait to receive their purchased item once it has shipped. **Required with `max_delivery_days`** if `mail_class` is null.",
+        "minimum": 1,
+        "maximum": 45
+      },
+      {
+        "name": "max_delivery_days",
+        "in": "body-form",
+        "required": false,
+        "type": "integer",
+        "description": "The maximum number of business days a buyer can expect to wait to receive their purchased item once it has shipped. **Required with `min_delivery_days`** if `mail_class` is null.",
+        "minimum": 1,
+        "maximum": 45
       }
     ]
   },
@@ -3119,9 +4103,16 @@ export const operations: OperationDescriptor[] = [
     "path": "/v3/application/scopes",
     "scopes": [],
     "oauth2": false,
-    "write": true,
+    "write": false,
     "toolset": "other",
-    "params": []
+    "params": [
+      {
+        "name": "token",
+        "in": "body-form",
+        "required": true,
+        "type": "string"
+      }
+    ]
   },
   {
     "toolName": "update_holiday_preferences",
@@ -3257,6 +4248,13 @@ export const operations: OperationDescriptor[] = [
           104,
           105
         ]
+      },
+      {
+        "name": "is_working",
+        "in": "body-form",
+        "required": true,
+        "type": "boolean",
+        "description": "A boolean value for whether the shop will process orders on a particular holiday."
       }
     ]
   },
@@ -3288,6 +4286,343 @@ export const operations: OperationDescriptor[] = [
         "type": "integer",
         "description": "The numeric ID for the [listing](/documentation/reference#tag/ShopListing) associated to this transaction.",
         "minimum": 1
+      },
+      {
+        "name": "image_ids",
+        "in": "body-form",
+        "required": false,
+        "type": "array",
+        "description": "An array of numeric image IDs of the images in a listing, which can include up to 20 images.",
+        "items": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      {
+        "name": "title",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "The listing's title string. When creating or updating a listing, valid title strings contain only letters, numbers, punctuation marks, mathematical symbols, whitespace characters, ™, ©, and ®. (regex: /[^\\p{L}\\p{Nd}\\p{P}\\p{Sm}\\p{Zs}™©®]/u) You can only use the %, :, & and + characters once each."
+      },
+      {
+        "name": "description",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "A description string of the product for sale in the listing."
+      },
+      {
+        "name": "materials",
+        "in": "body-form",
+        "required": false,
+        "type": "array",
+        "description": "A list of material strings for materials used in the product. Valid materials strings contain only letters, numbers, and whitespace characters. (regex: /[^\\p{L}\\p{Nd}\\p{Zs}]/u) Default value is null.",
+        "items": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "should_auto_renew",
+        "in": "body-form",
+        "required": false,
+        "type": "boolean",
+        "description": "When true, renews a listing for four months upon expiration."
+      },
+      {
+        "name": "shipping_profile_id",
+        "in": "body-form",
+        "required": false,
+        "type": "integer",
+        "description": "The numeric ID of the [shipping profile](/documentation/reference#operation/getShopShippingProfile) associated with the listing. Required when listing type is `physical`.",
+        "minimum": 1
+      },
+      {
+        "name": "return_policy_id",
+        "in": "body-form",
+        "required": false,
+        "type": "integer",
+        "description": "The numeric ID of the [Return Policy](/documentation/reference#operation/getShopReturnPolicies). Required for active physical listings. This requirement does not apply to listings of EU-based shops.",
+        "minimum": 1
+      },
+      {
+        "name": "shop_section_id",
+        "in": "body-form",
+        "required": false,
+        "type": "integer",
+        "description": "The numeric ID of the [shop section](/documentation/reference#tag/Shop-Section) for this listing. Default value is null."
+      },
+      {
+        "name": "item_weight",
+        "in": "body-form",
+        "required": false,
+        "type": "number",
+        "description": "The numeric weight of the product measured in units set in 'item_weight_unit'. Default value is null. If set, the value must be greater than 0.",
+        "minimum": 0,
+        "maximum": 1.79769313486e+308
+      },
+      {
+        "name": "item_length",
+        "in": "body-form",
+        "required": false,
+        "type": "number",
+        "description": "The numeric length of the product measured in units set in 'item_dimensions_unit'. Default value is null. If set, the value must be greater than 0.",
+        "minimum": 0,
+        "maximum": 1.79769313486e+308
+      },
+      {
+        "name": "item_width",
+        "in": "body-form",
+        "required": false,
+        "type": "number",
+        "description": "The numeric width of the product measured in units set in 'item_dimensions_unit'. Default value is null. If set, the value must be greater than 0.",
+        "minimum": 0,
+        "maximum": 1.79769313486e+308
+      },
+      {
+        "name": "item_height",
+        "in": "body-form",
+        "required": false,
+        "type": "number",
+        "description": "The numeric height of the product measured in units set in 'item_dimensions_unit'. Default value is null. If set, the value must be greater than 0.",
+        "minimum": 0,
+        "maximum": 1.79769313486e+308
+      },
+      {
+        "name": "item_weight_unit",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "A string defining the units used to measure the weight of the product. Default value is null.",
+        "enum": [
+          "",
+          "oz",
+          "lb",
+          "g",
+          "kg"
+        ]
+      },
+      {
+        "name": "item_dimensions_unit",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "A string defining the units used to measure the dimensions of the product. Default value is null.",
+        "enum": [
+          "",
+          "in",
+          "ft",
+          "mm",
+          "cm",
+          "m",
+          "yd",
+          "inches"
+        ]
+      },
+      {
+        "name": "is_taxable",
+        "in": "body-form",
+        "required": false,
+        "type": "boolean",
+        "description": "When true, applicable [shop](/documentation/reference#tag/Shop) tax rates apply to this listing at checkout."
+      },
+      {
+        "name": "taxonomy_id",
+        "in": "body-form",
+        "required": false,
+        "type": "integer",
+        "description": "The numerical taxonomy ID of the listing. See [SellerTaxonomy](/documentation/reference#tag/SellerTaxonomy) and [BuyerTaxonomy](/documentation/reference#tag/BuyerTaxonomy) for more information.",
+        "minimum": 1
+      },
+      {
+        "name": "tags",
+        "in": "body-form",
+        "required": false,
+        "type": "array",
+        "description": "A comma-separated list of tag strings for the listing. When creating or updating a listing, valid tag strings contain only letters, numbers, whitespace characters, -, ', ™, ©, and ®. (regex: /[^\\p{L}\\p{Nd}\\p{Zs}\\-'™©®]/u) Default value is null.",
+        "items": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "who_made",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "An enumerated string indicating who made the product. Helps buyers locate the listing under the Handmade heading. Requires 'is_supply' and 'when_made'.",
+        "enum": [
+          "i_did",
+          "someone_else",
+          "collective"
+        ]
+      },
+      {
+        "name": "when_made",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "An enumerated string for the era in which the maker made the product in this listing. Helps buyers locate the listing under the Vintage heading. Requires 'is_supply' and 'who_made'.",
+        "enum": [
+          "made_to_order",
+          "2020_2026",
+          "2010_2019",
+          "2007_2009",
+          "before_2007",
+          "2000_2006",
+          "1990s",
+          "1980s",
+          "1970s",
+          "1960s",
+          "1950s",
+          "1940s",
+          "1930s",
+          "1920s",
+          "1910s",
+          "1900s",
+          "1800s",
+          "1700s",
+          "before_1700"
+        ]
+      },
+      {
+        "name": "state",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "When _updating_ a listing, this value can be either `active` or `inactive`. Note: Setting a `draft` listing to `active` will also publish the listing on etsy.com and requires that the listing have an image set. Setting a `sold_out` listing to active will update the quantity to 1 and renew the listing on etsy.com.",
+        "enum": [
+          "active",
+          "inactive"
+        ]
+      },
+      {
+        "name": "is_supply",
+        "in": "body-form",
+        "required": false,
+        "type": "boolean",
+        "description": "When true, tags the listing as a supply product, else indicates that it's a finished product. Helps buyers locate the listing under the Supplies heading. Requires 'who_made' and 'when_made'."
+      },
+      {
+        "name": "production_partner_ids",
+        "in": "body-form",
+        "required": false,
+        "type": "array",
+        "description": "An array of unique IDs of production partner ids.",
+        "items": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      {
+        "name": "type",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "An enumerated type string that indicates whether the listing is physical or a digital download.",
+        "enum": [
+          "physical",
+          "download",
+          "both"
+        ]
+      },
+      {
+        "name": "ecgt_garan_brand",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "The brand or trademark name for the EU commercial guarantee (required under GPSR/ECGT for eligible EU traders). Maximum 25 characters. See the [Etsy Seller Handbook](https://help.etsy.com/hc/articles/43191692248343) for details. If any one of ecgt_garan_brand, ecgt_garan_model, ecgt_garan_years, or ecgt_garan_guarantee_details is provided and non-empty, all four are required. Silently ignored for digital listings and for sellers who are not eligible EU traders."
+      },
+      {
+        "name": "ecgt_garan_years",
+        "in": "body-form",
+        "required": false,
+        "type": "integer",
+        "description": "Duration of the EU commercial guarantee in whole years (minimum 3, maximum 99). Required together with ecgt_garan_brand, ecgt_garan_model, and ecgt_garan_guarantee_details. Silently ignored for digital listings and for sellers who are not eligible EU traders."
+      },
+      {
+        "name": "ecgt_garan_model",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "The product model or reference number for the EU commercial guarantee label. Maximum 20 characters. Required together with ecgt_garan_brand, ecgt_garan_years, and ecgt_garan_guarantee_details. Silently ignored for digital listings and for sellers who are not eligible EU traders."
+      },
+      {
+        "name": "ecgt_garan_guarantee_details",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "Free-text description of the EU commercial guarantee terms and coverage. Maximum 255 characters. Required together with ecgt_garan_brand, ecgt_garan_model, and ecgt_garan_years. Silently ignored for digital listings and for sellers who are not eligible EU traders."
+      },
+      {
+        "name": "ecgt_other_commercial_guarantee_details",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "Free-text details of any additional commercial guarantee or warranty beyond the primary EU commercial guarantee. Maximum 255 characters. Silently ignored for digital listings and for sellers who are not eligible EU traders."
+      },
+      {
+        "name": "ecgt_after_sales_service_info",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "After-sales service, repairability, or eco-friendly delivery information required under EU GPSR/ECGT regulations. Maximum 255 characters. Silently ignored for digital listings and for sellers who are not eligible EU traders."
+      },
+      {
+        "name": "ecgt_software_update_details",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "Details of software update availability and the duration of such updates, as required under EU ECGT regulations for digital content. Maximum 255 characters. Silently ignored for physical listings and for sellers who are not eligible EU traders."
+      },
+      {
+        "name": "gpsr_manufacturer_type",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "Who the manufacturer of this product is, for GPSR (EU General Product Safety Regulation) purposes. Either `seller` (your shop is the manufacturer) or `economic_operator` (a manufacturer record from the [Shop Economic Operators](/documentation/reference#tag/Shop-Economic-Operators) endpoints, identified by `gpsr_manufacturer_id`). `seller` is rejected when `who_made` is `someone_else`; use `economic_operator` for items made by a third party. Send `null` to clear. Optional for now; it becomes required for listings from eligible traders that sell into the EU 60 days after these fields were announced. See the [GPSR Economic Operators Tutorial](/documentation/tutorials/gpsr-economic-operators) for eligibility and the full flow.",
+        "enum": [
+          "seller",
+          "economic_operator"
+        ]
+      },
+      {
+        "name": "gpsr_manufacturer_id",
+        "in": "body-form",
+        "required": false,
+        "type": "integer",
+        "description": "The `economic_operator_id` of the manufacturer, from the [Shop Economic Operators](/documentation/reference#tag/Shop-Economic-Operators) endpoints. Required when `gpsr_manufacturer_type` is `economic_operator`, and rejected when the type is anything else. The operator must belong to this shop and not be deleted. The manufacturer may be located anywhere in the world. If you change `gpsr_manufacturer_type` to `seller` without sending this field, the stored id is cleared for you."
+      },
+      {
+        "name": "gpsr_responsible_person_type",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "Who the EU responsible person for this product is, for GPSR purposes. Either `seller` (your shop; only valid when the shop's legal address, or the address on file, is in the European Union) or `economic_operator` (a record from the [Shop Economic Operators](/documentation/reference#tag/Shop-Economic-Operators) endpoints, identified by `gpsr_responsible_person_id`, which must have an address in the European Union). Send `null` to clear. Optional for now; it becomes required for listings from eligible traders that sell into the EU 60 days after these fields were announced. See the [GPSR Economic Operators Tutorial](/documentation/tutorials/gpsr-economic-operators) for eligibility and the full flow.",
+        "enum": [
+          "seller",
+          "economic_operator"
+        ]
+      },
+      {
+        "name": "gpsr_responsible_person_id",
+        "in": "body-form",
+        "required": false,
+        "type": "integer",
+        "description": "The `economic_operator_id` of the EU responsible person, from the [Shop Economic Operators](/documentation/reference#tag/Shop-Economic-Operators) endpoints. Required when `gpsr_responsible_person_type` is `economic_operator`, and rejected when the type is anything else. The operator must belong to this shop and not be deleted, and its address must be in the European Union. If you change `gpsr_responsible_person_type` to `seller` without sending this field, the stored id is cleared for you."
+      },
+      {
+        "name": "gpsr_serial_number",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "An optional serial number, batch number, or lot identifier that lets the product be traced for GPSR purposes. Maximum 255 characters. Send `null` to clear."
+      },
+      {
+        "name": "gpsr_safety_warnings",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "Optional free-text safety warnings and safety information for the product regarding GPSR purposes, shown to buyers as product safety information on the listing page (for example age restrictions, choking hazards, or care and handling instructions). Maximum 102,400 characters. Send `null` to clear."
       }
     ]
   },
@@ -3329,6 +4664,151 @@ export const operations: OperationDescriptor[] = [
         "required": false,
         "type": "boolean",
         "description": "This temporary parameter indicates whether scale validation should be enabled for the request. It will be removed in the near future, at which point scale validation will be mandatory for all requests."
+      },
+      {
+        "name": "products",
+        "in": "body-json",
+        "required": true,
+        "type": "array",
+        "description": "A JSON array of products available in a listing, even if only one product. All field names in the JSON blobs are lowercase.",
+        "items": {
+          "type": "object",
+          "properties": [
+            {
+              "name": "sku",
+              "required": false,
+              "type": "string",
+              "description": "The SKU string for the product"
+            },
+            {
+              "name": "property_values",
+              "required": false,
+              "type": "array",
+              "description": "A list of property value entries for this product. Note: parenthesis characters (`(` and `)`) are not allowed.",
+              "items": {
+                "type": "object",
+                "properties": [
+                  {
+                    "name": "property_id",
+                    "required": true,
+                    "type": "integer",
+                    "description": "The unique ID of an Etsy [listing property](/documentation/reference#operation/getListingInventory).",
+                    "minimum": 1
+                  },
+                  {
+                    "name": "value_ids",
+                    "required": true,
+                    "type": "array",
+                    "description": "An array of unique IDs of Etsy [listing property](/documentation/reference#operation/getListingInventory) values.",
+                    "items": {
+                      "type": "integer",
+                      "minimum": 1
+                    }
+                  },
+                  {
+                    "name": "scale_id",
+                    "required": false,
+                    "type": "integer",
+                    "description": "The numeric ID of a single Etsy.com measurement scale. For example, for shoe size, there are three `scale_id`s available - `UK`, `US/Canada`, and `EU`, where `US/Canada` has `scale_id` 19.",
+                    "minimum": 1
+                  },
+                  {
+                    "name": "property_name",
+                    "required": false,
+                    "type": "string",
+                    "description": "The name of the property, in the requested locale language."
+                  },
+                  {
+                    "name": "values",
+                    "required": true,
+                    "type": "array",
+                    "description": "A list of property value entries for this product. Note: parenthesis characters (`(` and `)`) are not allowed.",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "name": "offerings",
+              "required": true,
+              "type": "array",
+              "description": "A list of product offering entries for this product.",
+              "items": {
+                "type": "object",
+                "properties": [
+                  {
+                    "name": "price",
+                    "required": true,
+                    "type": "number",
+                    "description": "The price of the product."
+                  },
+                  {
+                    "name": "quantity",
+                    "required": true,
+                    "type": "integer",
+                    "description": "How many of this product are available?"
+                  },
+                  {
+                    "name": "is_enabled",
+                    "required": true,
+                    "type": "boolean",
+                    "description": "True if the offering is shown to buyers"
+                  },
+                  {
+                    "name": "readiness_state_id",
+                    "required": false,
+                    "type": "integer",
+                    "description": "The numeric ID of the [processing profile](/documentation/reference#operation/getShopReadinessStateDefinition) associated with the listing. Returned only when the listing is `active` and of type `physical`, and the endpoint is either shop-scoped (path contains `shop_id`) or a single-listing request such as `getListing`. For every other case this field can be null.",
+                    "minimum": 1
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      },
+      {
+        "name": "price_on_property",
+        "in": "body-json",
+        "required": false,
+        "type": "array",
+        "description": "An array of unique [listing property](/documentation/reference#operation/getListingInventory) ID integers for the properties that change product prices, if any. For example, if you charge specific prices for different sized products in the same listing, then this array contains the property ID for size.",
+        "items": {
+          "type": "integer"
+        }
+      },
+      {
+        "name": "quantity_on_property",
+        "in": "body-json",
+        "required": false,
+        "type": "array",
+        "description": "An array of unique [listing property](/documentation/reference#operation/getListingInventory) ID integers for the properties that change the quantity of the products, if any. For example, if you stock specific quantities of different colored products in the same listing, then this array contains the property ID for color.",
+        "items": {
+          "type": "integer"
+        }
+      },
+      {
+        "name": "sku_on_property",
+        "in": "body-json",
+        "required": false,
+        "type": "array",
+        "description": "An array of unique [listing property](/documentation/reference#operation/getListingInventory) ID integers for the properties that change the product SKU, if any. For example, if you use specific skus for different colored products in the same listing, then this array contains the property ID for color.",
+        "items": {
+          "type": "integer"
+        }
+      },
+      {
+        "name": "readiness_state_on_property",
+        "in": "body-json",
+        "required": false,
+        "type": "array",
+        "description": "An array of unique [listing property](/documentation/reference#operation/getListingInventory) ID integers for the properties that change processing profile, if any. For example, if you need specific processing profiles for different colored products in the same listing, then this array contains the property ID for color.",
+        "items": {
+          "type": "integer",
+          "minimum": 1
+        }
       }
     ]
   },
@@ -3367,6 +4847,96 @@ export const operations: OperationDescriptor[] = [
         "required": false,
         "type": "boolean",
         "description": "This query parameter indicates that the caller supports up to 5 personalization questions and the following question types: 'text_input', 'dropdown', 'unlabeled_upload', 'labeled_upload'. Sending this param without updating your application can lead to inadvertently deleting seller-entered data."
+      },
+      {
+        "name": "personalization_questions",
+        "in": "body-json",
+        "required": true,
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": [
+            {
+              "name": "question_id",
+              "required": false,
+              "type": "integer",
+              "description": "The ID of the personalization question. This field is optional. Include it when updating an existing question; omit it when creating a new question. Note: This value may change if the personalization question is updated.",
+              "minimum": 1
+            },
+            {
+              "name": "question_text",
+              "required": true,
+              "type": "string",
+              "description": "The title of the personalization question. Must be between 1 and 45 characters. See https://developers.etsy.com/documentation/tutorials/personalization-migration#writing-listing-personalization-data"
+            },
+            {
+              "name": "instructions",
+              "required": false,
+              "type": "string",
+              "description": "Optional instructions for a personalization question. This field is not allowed for 'dropdown' questions. See https://developers.etsy.com/documentation/tutorials/personalization-migration#writing-listing-personalization-data"
+            },
+            {
+              "name": "question_type",
+              "required": true,
+              "type": "string",
+              "description": "The type of the personalization question. Note: Currently, only a single question with type 'text_input' is supported. See https://developers.etsy.com/documentation/tutorials/personalization-migration for details about new question types.",
+              "enum": [
+                "text_input",
+                "dropdown",
+                "unlabeled_upload",
+                "labeled_upload"
+              ]
+            },
+            {
+              "name": "required",
+              "required": true,
+              "type": "boolean",
+              "description": "When true, the personalization question is required."
+            },
+            {
+              "name": "max_allowed_files",
+              "required": false,
+              "type": "integer",
+              "description": "The maximum number of files the buyer may upload in response to a personalization question. This field is optional and only applicable to 'unlabeled_upload' and 'labeled_upload' questions."
+            },
+            {
+              "name": "max_allowed_characters",
+              "required": false,
+              "type": "integer",
+              "description": "The maximum number of characters the buyer may enter in response to a personalization question. This field is optional and only applicable to 'text_input' questions."
+            },
+            {
+              "name": "options",
+              "required": false,
+              "type": "array",
+              "description": "The list of options for a personalization question. For 'dropdown' questions, this list contains the options for the dropdown. For 'labeled_upload' questions, this list contains the labels for the files that the buyer may upload, and must match the max_allowed_files value..",
+              "items": {
+                "type": "object",
+                "properties": [
+                  {
+                    "name": "option_id",
+                    "required": false,
+                    "type": "integer",
+                    "description": "The ID of the option. This field is optional. Include it when updating an existing option; omit it when creating a new option. Note: This value may change if the option or question is updated.",
+                    "minimum": 1
+                  },
+                  {
+                    "name": "label",
+                    "required": true,
+                    "type": "string",
+                    "description": "The option label. Note: For 'dropdown' questions, max length is 20 characters. For 'labeled_upload' questions, max length is 45 characters."
+                  }
+                ]
+              }
+            },
+            {
+              "name": "add_on_price",
+              "required": false,
+              "type": "number",
+              "description": "The add-on price for a question. This field is optional and only supported for optional questions of type text_input."
+            }
+          ]
+        }
       }
     ]
   },
@@ -3406,6 +4976,35 @@ export const operations: OperationDescriptor[] = [
         "type": "integer",
         "description": "The unique ID of an Etsy [listing property](/documentation/reference#operation/getListingProperties).",
         "minimum": 1
+      },
+      {
+        "name": "value_ids",
+        "in": "body-form",
+        "required": true,
+        "type": "array",
+        "description": "An array of unique IDs of multiple Etsy [listing property](/documentation/reference#operation/getListingProperties) values. For example, if your listing is composed of different materials, then the value ID list contains value IDs for each material.",
+        "items": {
+          "type": "integer",
+          "minimum": 1
+        }
+      },
+      {
+        "name": "values",
+        "in": "body-form",
+        "required": true,
+        "type": "array",
+        "description": "An array of value strings for multiple Etsy [listing property](/documentation/reference#operation/getListingProperties) values. For example, if your listing is painted in different colors, then the values array contains the color strings for each color. Note: parenthesis characters (`(` and `)`) are not allowed.",
+        "items": {
+          "type": "string"
+        }
+      },
+      {
+        "name": "scale_id",
+        "in": "body-form",
+        "required": false,
+        "type": "integer",
+        "description": "The numeric ID of a single Etsy.com measurement scale. For example, for shoe size, there are three `scale_id`s available - `UK`, `US/Canada`, and `EU`, where `US/Canada` has `scale_id` 19.",
+        "minimum": 1
       }
     ]
   },
@@ -3444,6 +5043,30 @@ export const operations: OperationDescriptor[] = [
         "required": true,
         "type": "string",
         "description": "The IETF language tag for the language of this translation. Ex: `de`, `en`, `es`, `fr`, `it`, `ja`, `nl`, `pl`, `pt`."
+      },
+      {
+        "name": "title",
+        "in": "body-form",
+        "required": true,
+        "type": "string",
+        "description": "The title of the Listing of this Translation."
+      },
+      {
+        "name": "description",
+        "in": "body-form",
+        "required": true,
+        "type": "string",
+        "description": "The description of the Listing of this Translation."
+      },
+      {
+        "name": "tags",
+        "in": "body-form",
+        "required": false,
+        "type": "array",
+        "description": "The tags of the Listing of this Translation.",
+        "items": {
+          "type": "string"
+        }
       }
     ]
   },
@@ -3468,6 +5091,41 @@ export const operations: OperationDescriptor[] = [
         "type": "integer",
         "description": "The unique positive non-zero numeric ID for an Etsy Shop.",
         "minimum": 1
+      },
+      {
+        "name": "title",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "A brief heading string for the shop's main page."
+      },
+      {
+        "name": "announcement",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "An announcement string to buyers that displays on the shop's homepage."
+      },
+      {
+        "name": "sale_message",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "A message string sent to users who complete a purchase from this shop."
+      },
+      {
+        "name": "digital_sale_message",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "A message string sent to users who purchase a digital item from this shop."
+      },
+      {
+        "name": "policy_additional",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "The shop's additional policies string (may be blank)."
       }
     ]
   },
@@ -3499,6 +5157,83 @@ export const operations: OperationDescriptor[] = [
         "type": "integer",
         "description": "The unique numeric ID of an economic operator (a manufacturer or EU responsible person record) belonging to a shop, used for GPSR compliance.",
         "minimum": 1
+      },
+      {
+        "name": "operator_name",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "The legal or trading name of the business or individual acting as economic operator, as it should be shown to buyers and market surveillance authorities. Required, cannot be blank. Maximum 50 characters."
+      },
+      {
+        "name": "email",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "The contact email address of the economic operator, where buyers and authorities can reach it about product safety. Required and must be a valid email address. Maximum 255 characters."
+      },
+      {
+        "name": "first_line",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "The first line of the economic operator's postal address (street and number). Required, cannot be blank. Maximum 50 characters (95 in a few countries, such as India, Brazil, and Japan)."
+      },
+      {
+        "name": "second_line",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "The second line of the economic operator's postal address (apartment, suite, building). Optional. Maximum 50 characters (95 in a few countries, such as India, Brazil, and Japan). Send `null` on update to clear it. Returned as `null` when not set."
+      },
+      {
+        "name": "city",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "The city or town of the economic operator's postal address. Required, cannot be blank. Maximum 50 characters (95 in a few countries, such as India, Brazil, and Japan)."
+      },
+      {
+        "name": "state",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "The state, province, or region of the economic operator's postal address. Required if the `country_iso` requires a state; optional otherwise. Maximum 50 characters (95 in a few countries, such as India, Brazil, and Japan). See the [list of countries](/documentation/tutorials/gpsr-economic-operators#countries-requiring-a-state). On update, send `null` to clear it (not allowed for those countries). Returned as `null` when not set."
+      },
+      {
+        "name": "zip",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "The postal code of the economic operator's postal address. Required, cannot be blank."
+      },
+      {
+        "name": "country_iso",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "The ISO 3166-1 alpha-2 code of the country of the economic operator's postal address, for example `DE` or `FR`. Not case-sensitive on input; always returned in upper case. Required."
+      },
+      {
+        "name": "phone",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "The contact phone number of the economic operator. Required, cannot be blank. May contain digits, spaces, and the characters ( ) . - + #. Phone number must be valid."
+      },
+      {
+        "name": "phone_country_iso",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "The ISO 3166-1 alpha-2 country code that `phone` belongs to, for example `DE`. Optional. Not case-sensitive on input; always returned in upper case."
+      },
+      {
+        "name": "trademark_name",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "The brand or trademark the economic operator trades under, when it differs from `operator_name`. Optional. Maximum 255 characters. Send `null` on update to clear it. Returned as `null` when not set."
       }
     ]
   },
@@ -3530,6 +5265,46 @@ export const operations: OperationDescriptor[] = [
         "type": "integer",
         "description": "The numeric ID of the [processing profile](/documentation/reference#operation/getShopReadinessStateDefinition) associated with the listing. Returned only when the listing is `active` and of type `physical`, and the endpoint is either shop-scoped (path contains `shop_id`) or a single-listing request such as `getListing`. For every other case this field can be null.",
         "minimum": 1
+      },
+      {
+        "name": "readiness_state",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "The readiness state of a product: \\\"1\\\" means \\\"ready_to_ship\\\", and \\\"2\\\" means \\\"made_to_order\\\"",
+        "enum": [
+          "ready_to_ship",
+          "made_to_order"
+        ]
+      },
+      {
+        "name": "min_processing_time",
+        "in": "body-form",
+        "required": false,
+        "type": "integer",
+        "description": "The minimum number of days or weeks for processing a specific product.",
+        "minimum": 1,
+        "maximum": 10
+      },
+      {
+        "name": "max_processing_time",
+        "in": "body-form",
+        "required": false,
+        "type": "integer",
+        "description": "The maximum number of days or weeks for processing a specific product.",
+        "minimum": 1,
+        "maximum": 10
+      },
+      {
+        "name": "processing_time_unit",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "The unit used to represent how long a processing time is. A week is equivalent to how many days the seller works per week as stated in their processing schedule. If none is provided, the unit is set to \\\"days\\\".",
+        "enum": [
+          "days",
+          "weeks"
+        ]
       }
     ]
   },
@@ -3568,6 +5343,20 @@ export const operations: OperationDescriptor[] = [
         "required": false,
         "type": "boolean",
         "description": "This parameter needed to enable new parameters and response values related to processing profiles."
+      },
+      {
+        "name": "was_shipped",
+        "in": "body-form",
+        "required": false,
+        "type": "boolean",
+        "description": "When `true`, returns receipts where the seller shipped the product(s) in this receipt. When `false`, returns receipts where shipment has not been set."
+      },
+      {
+        "name": "was_paid",
+        "in": "body-form",
+        "required": false,
+        "type": "boolean",
+        "description": "When `true`, returns receipts where the seller has received payment for the receipt. When `false`, returns receipts where payment has not been received."
       }
     ]
   },
@@ -3599,6 +5388,25 @@ export const operations: OperationDescriptor[] = [
         "type": "integer",
         "description": "The numeric ID of the [Return Policy](/documentation/reference#operation/getShopReturnPolicies).",
         "minimum": 1
+      },
+      {
+        "name": "accepts_returns",
+        "in": "body-form",
+        "required": true,
+        "type": "boolean"
+      },
+      {
+        "name": "accepts_exchanges",
+        "in": "body-form",
+        "required": true,
+        "type": "boolean"
+      },
+      {
+        "name": "return_deadline",
+        "in": "body-form",
+        "required": false,
+        "type": "integer",
+        "description": "The deadline for the Return Policy, measured in days. The value must be one of the following: [7, 14, 21, 30, 45, 60, 90]."
       }
     ]
   },
@@ -3630,6 +5438,13 @@ export const operations: OperationDescriptor[] = [
         "type": "integer",
         "description": "The numeric ID of a section in a specific Etsy shop.",
         "minimum": 1
+      },
+      {
+        "name": "title",
+        "in": "body-form",
+        "required": true,
+        "type": "string",
+        "description": "The title string for a shop section."
       }
     ]
   },
@@ -3661,6 +5476,56 @@ export const operations: OperationDescriptor[] = [
         "type": "integer",
         "description": "The numeric ID of the [shipping profile](/documentation/reference#operation/getShopShippingProfile) associated with the listing. Required when listing type is `physical`.",
         "minimum": 1
+      },
+      {
+        "name": "title",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "The name string of this shipping profile."
+      },
+      {
+        "name": "origin_country_iso",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "The ISO code of the country from which the listing ships."
+      },
+      {
+        "name": "min_processing_time",
+        "in": "body-form",
+        "required": false,
+        "type": "integer",
+        "description": "The minimum time required to process to ship listings with this shipping profile.",
+        "minimum": 1,
+        "maximum": 10
+      },
+      {
+        "name": "max_processing_time",
+        "in": "body-form",
+        "required": false,
+        "type": "integer",
+        "description": "The maximum processing time the listing needs to ship.",
+        "minimum": 1,
+        "maximum": 10
+      },
+      {
+        "name": "processing_time_unit",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "The unit used to represent how long a processing time is. A week is equivalent to the set processing schedule (default to 5 business days). If none is provided, the unit is set to \"business_days\".",
+        "enum": [
+          "business_days",
+          "weeks"
+        ]
+      },
+      {
+        "name": "origin_postal_code",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "The postal code string (not necessarily a number) for the location from which the listing ships. Required if the `origin_country_iso` supports postal codes. See the [Fulfillment Tutorial docs](https://developer.etsy.com/documentation/tutorials/fulfillment/#countries-requiring-postal-codes) for more info"
       }
     ]
   },
@@ -3700,6 +5565,74 @@ export const operations: OperationDescriptor[] = [
         "type": "integer",
         "description": "The numeric ID of the shipping profile destination in the [shipping profile](/documentation/reference#tag/Shop-ShippingProfile) associated with the listing.",
         "minimum": 1
+      },
+      {
+        "name": "primary_cost",
+        "in": "body-form",
+        "required": false,
+        "type": "number",
+        "description": "The cost of shipping to this country/region alone, measured in the store's default currency.",
+        "minimum": 0
+      },
+      {
+        "name": "secondary_cost",
+        "in": "body-form",
+        "required": false,
+        "type": "number",
+        "description": "The cost of shipping to this country/region with another item, measured in the store's default currency.",
+        "minimum": 0
+      },
+      {
+        "name": "destination_country_iso",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "The ISO code of the country to which the listing ships. If null, request sets destination to destination_region. Required if destination_region is null or not provided."
+      },
+      {
+        "name": "destination_region",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "The code of the region to which the listing ships. A region represents a set of countries. Supported regions are Europe Union and Non-Europe Union (countries in Europe not in EU). If `none`, request sets destination to destination_country_iso. Required if destination_country_iso is null or not provided.",
+        "enum": [
+          "eu",
+          "non_eu",
+          "none"
+        ]
+      },
+      {
+        "name": "shipping_carrier_id",
+        "in": "body-form",
+        "required": false,
+        "type": "integer",
+        "description": "The unique ID of a supported shipping carrier, which is used to calculate an Estimated Delivery Date. **Required with `mail_class`** if `min_delivery_days` and `max_delivery_days` are null.",
+        "minimum": 0
+      },
+      {
+        "name": "mail_class",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "The unique ID string of a shipping carrier's mail class, which is used to calculate an estimated delivery date. **Required with `shipping_carrier_id`** if `min_delivery_days` and `max_delivery_days` are null."
+      },
+      {
+        "name": "min_delivery_days",
+        "in": "body-form",
+        "required": false,
+        "type": "integer",
+        "description": "The minimum number of business days a buyer can expect to wait to receive their purchased item once it has shipped. **Required with `max_delivery_days`** if `mail_class` is null.",
+        "minimum": 1,
+        "maximum": 45
+      },
+      {
+        "name": "max_delivery_days",
+        "in": "body-form",
+        "required": false,
+        "type": "integer",
+        "description": "The maximum number of business days a buyer can expect to wait to receive their purchased item once it has shipped. **Required with `min_delivery_days`** if `mail_class` is null.",
+        "minimum": 1,
+        "maximum": 45
       }
     ]
   },
@@ -3739,6 +5672,73 @@ export const operations: OperationDescriptor[] = [
         "type": "integer",
         "description": "The numeric ID that is associated with a shipping upgrade",
         "minimum": 1
+      },
+      {
+        "name": "upgrade_name",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "Name for the shipping upgrade shown to shoppers at checkout, e.g. USPS Priority."
+      },
+      {
+        "name": "type",
+        "in": "body-form",
+        "required": false,
+        "type": "integer",
+        "description": "The type of the shipping upgrade. Domestic (0) or international (1).",
+        "enum": [
+          0,
+          1
+        ]
+      },
+      {
+        "name": "price",
+        "in": "body-form",
+        "required": false,
+        "type": "number",
+        "description": "Additional cost of adding the shipping upgrade.",
+        "minimum": 0
+      },
+      {
+        "name": "secondary_price",
+        "in": "body-form",
+        "required": false,
+        "type": "number",
+        "description": "Additional cost of adding the shipping upgrade for each additional item.",
+        "minimum": 0
+      },
+      {
+        "name": "shipping_carrier_id",
+        "in": "body-form",
+        "required": false,
+        "type": "integer",
+        "description": "The unique ID of a supported shipping carrier, which is used to calculate an Estimated Delivery Date. **Required with `mail_class`** if `min_delivery_days` and `max_delivery_days` are null.",
+        "minimum": 0
+      },
+      {
+        "name": "mail_class",
+        "in": "body-form",
+        "required": false,
+        "type": "string",
+        "description": "The unique ID string of a shipping carrier's mail class, which is used to calculate an estimated delivery date. **Required with `shipping_carrier_id`** if `min_delivery_days` and `max_delivery_days` are null."
+      },
+      {
+        "name": "min_delivery_days",
+        "in": "body-form",
+        "required": false,
+        "type": "integer",
+        "description": "The minimum number of business days a buyer can expect to wait to receive their purchased item once it has shipped. **Required with `max_delivery_days`** if `mail_class` is null.",
+        "minimum": 1,
+        "maximum": 45
+      },
+      {
+        "name": "max_delivery_days",
+        "in": "body-form",
+        "required": false,
+        "type": "integer",
+        "description": "The maximum number of business days a buyer can expect to wait to receive their purchased item once it has shipped. **Required with `min_delivery_days`** if `mail_class` is null.",
+        "minimum": 1,
+        "maximum": 45
       }
     ]
   },
@@ -3770,6 +5770,36 @@ export const operations: OperationDescriptor[] = [
         "type": "integer",
         "description": "The numeric ID for the [listing](/documentation/reference#tag/ShopListing) associated to this transaction.",
         "minimum": 1
+      },
+      {
+        "name": "variation_images",
+        "in": "body-json",
+        "required": true,
+        "type": "array",
+        "description": "A list of variation image data.",
+        "items": {
+          "type": "object",
+          "properties": [
+            {
+              "name": "property_id",
+              "required": true,
+              "type": "integer",
+              "minimum": 1
+            },
+            {
+              "name": "value_id",
+              "required": true,
+              "type": "integer",
+              "minimum": 1
+            },
+            {
+              "name": "image_id",
+              "required": true,
+              "type": "integer",
+              "minimum": 1
+            }
+          ]
+        }
       }
     ]
   },
@@ -3800,6 +5830,36 @@ export const operations: OperationDescriptor[] = [
         "required": true,
         "type": "integer",
         "description": "The numeric ID for the [listing](/documentation/reference#tag/ShopListing) associated to this transaction.",
+        "minimum": 1
+      },
+      {
+        "name": "listing_file_id",
+        "in": "body-multipart",
+        "required": false,
+        "type": "integer",
+        "description": "The unique numeric ID of a file associated with a digital listing.",
+        "minimum": 1
+      },
+      {
+        "name": "file",
+        "in": "body-multipart-file",
+        "required": false,
+        "type": "string",
+        "description": "A binary file to upload."
+      },
+      {
+        "name": "name",
+        "in": "body-multipart",
+        "required": false,
+        "type": "string",
+        "description": "The file name string of a file to upload"
+      },
+      {
+        "name": "rank",
+        "in": "body-multipart",
+        "required": false,
+        "type": "integer",
+        "description": "The positive non-zero numeric position in the images displayed in a listing, with rank 1 images appearing in the left-most position in a listing.",
         "minimum": 1
       }
     ]
@@ -3832,6 +5892,50 @@ export const operations: OperationDescriptor[] = [
         "type": "integer",
         "description": "The numeric ID for the [listing](/documentation/reference#tag/ShopListing) associated to this transaction.",
         "minimum": 1
+      },
+      {
+        "name": "image",
+        "in": "body-multipart-file",
+        "required": false,
+        "type": "string",
+        "description": "The file name string of a file to upload"
+      },
+      {
+        "name": "listing_image_id",
+        "in": "body-multipart",
+        "required": false,
+        "type": "integer",
+        "description": "The numeric ID of the primary [listing image](/documentation/reference#tag/ShopListing-Image) for this transaction.",
+        "minimum": 1
+      },
+      {
+        "name": "rank",
+        "in": "body-multipart",
+        "required": false,
+        "type": "integer",
+        "description": "The positive non-zero numeric position in the images displayed in a listing, with rank 1 images appearing in the left-most position in a listing.",
+        "minimum": 0
+      },
+      {
+        "name": "overwrite",
+        "in": "body-multipart",
+        "required": false,
+        "type": "boolean",
+        "description": "When true, this request replaces the existing image at a given rank."
+      },
+      {
+        "name": "is_watermarked",
+        "in": "body-multipart",
+        "required": false,
+        "type": "boolean",
+        "description": "When true, indicates that the uploaded image has a watermark."
+      },
+      {
+        "name": "alt_text",
+        "in": "body-multipart",
+        "required": false,
+        "type": "string",
+        "description": "Alt text for the listing image. Max length 500 characters."
       }
     ]
   },
@@ -3863,6 +5967,28 @@ export const operations: OperationDescriptor[] = [
         "type": "integer",
         "description": "The numeric ID for the [listing](/documentation/reference#tag/ShopListing) associated to this transaction.",
         "minimum": 1
+      },
+      {
+        "name": "video_id",
+        "in": "body-multipart",
+        "required": false,
+        "type": "integer",
+        "description": "The unique ID of a video associated with a listing.",
+        "minimum": 1
+      },
+      {
+        "name": "video",
+        "in": "body-multipart-file",
+        "required": false,
+        "type": "string",
+        "description": "A video file to upload."
+      },
+      {
+        "name": "name",
+        "in": "body-multipart",
+        "required": false,
+        "type": "string",
+        "description": "The file name string for the video to upload."
       }
     ]
   }

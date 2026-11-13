@@ -10,6 +10,8 @@ export interface Config {
   configDir: string;
   /** Enabled Toolsets; undefined means all. */
   toolsets?: Toolset[];
+  /** Offer Write Tools (ETSY_ALLOW_WRITES=true); false is Read-only Mode. */
+  allowWrites: boolean;
 }
 
 export function loadConfig(
@@ -31,7 +33,15 @@ export function loadConfig(
     refreshToken: env.ETSY_REFRESH_TOKEN || undefined,
     configDir: defaultConfigDir(),
     toolsets: parseToolsets(env.ETSY_TOOLSETS),
+    allowWrites: parseAllowWrites(env.ETSY_ALLOW_WRITES),
   };
+}
+
+function parseAllowWrites(raw: string | undefined): boolean {
+  const value = raw?.trim().toLowerCase() ?? "";
+  if (value === "" || value === "false") return false;
+  if (value === "true") return true;
+  throw new Error(`ETSY_ALLOW_WRITES must be "true" or "false", got "${raw}". Unset it for Read-only Mode.`);
 }
 
 function parseToolsets(raw: string | undefined): Toolset[] | undefined {

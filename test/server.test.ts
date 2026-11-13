@@ -8,10 +8,11 @@ import { valueSchema } from "../src/server.js";
 import { connect } from "./harness.js";
 
 describe("tools/list", () => {
-  it("lists the 64 generated read tools with spec descriptions", async () => {
+  it("lists the 64 GET tools plus token_scopes by default, with spec descriptions", async () => {
     const { client } = await connect();
     const { tools } = await client.listTools();
-    expect(tools).toHaveLength(64);
+    expect(tools).toHaveLength(65);
+    expect(tools.map((t) => t.name)).toContain("token_scopes");
     const names = tools.map((t) => t.name);
     expect(names).toContain("get_listing");
     expect(names).not.toContain("search_listings");
@@ -31,7 +32,7 @@ describe("ETSY_TOOLSETS", () => {
   };
 
   it("offers every read Tool when unset", async () => {
-    expect((await listedToolsets()).names).toHaveLength(64);
+    expect((await listedToolsets()).names).toHaveLength(65);
   });
 
   it("offers only Tools from the selected Toolsets", async () => {
@@ -155,6 +156,7 @@ describe("loadConfig", () => {
       refreshToken: undefined,
       configDir: join(homedir(), ".config", "etsy-mcp"),
       toolsets: undefined,
+      allowWrites: false,
     });
   });
   it("reads ETSY_REFRESH_TOKEN", () => {
@@ -168,6 +170,26 @@ describe("loadConfig", () => {
     expect(warnings[0]).toMatch(/ETSY_ACCESS_TOKEN.*no longer used/);
     loadConfig(base, (m) => warnings.push(m));
     expect(warnings).toHaveLength(1);
+  });
+
+  describe("ETSY_ALLOW_WRITES", () => {
+    const base = { ETSY_API_KEY: "k", ETSY_SHARED_SECRET: "s" };
+    const allowWrites = (v?: string) => loadConfig({ ...base, ETSY_ALLOW_WRITES: v }).allowWrites;
+
+    it("is Read-only Mode unless set to true", () => {
+      expect(allowWrites()).toBe(false);
+      expect(allowWrites("")).toBe(false);
+      expect(allowWrites("false")).toBe(false);
+    });
+
+    it("enables Write Tools for true, ignoring case and whitespace", () => {
+      expect(allowWrites("true")).toBe(true);
+      expect(allowWrites(" TRUE ")).toBe(true);
+    });
+
+    it("fails on any other value rather than silently staying read-only", () => {
+      expect(() => allowWrites("yes")).toThrow(/ETSY_ALLOW_WRITES must be "true" or "false"/);
+    });
   });
 
   describe("ETSY_TOOLSETS", () => {

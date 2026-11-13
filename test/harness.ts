@@ -27,7 +27,7 @@ export async function connect(
   const requests: RecordedRequest[] = [];
   const configDir = config.configDir ?? tempConfigDir();
   const server = createServer(
-    { apiKey: "key", sharedSecret: "secret", ...config, configDir },
+    { apiKey: "key", sharedSecret: "secret", allowWrites: false, ...config, configDir },
     {
       ...deps,
       fetch: async (url, init) => {
