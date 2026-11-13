@@ -41,6 +41,10 @@ Every Tool belongs to exactly one Toolset: `listings`, `shop`, `shipping`, `orde
 
 Public Operations need only `ETSY_API_KEY` and `ETSY_SHARED_SECRET`; they never touch an OAuth token. Operations that require OAuth (e.g. `get_shop_receipts`) send `Authorization: Bearer <access token>`.
 
+### Login
+
+Run `npx @artisanxl/etsy-mcp login` (with `ETSY_API_KEY` set) once to authorize in your browser. It uses OAuth 2.0 Authorization Code with PKCE (S256) and a `state` check, listens on `http://localhost:3003/callback` for the redirect, and saves the tokens below. Register that exact redirect URI in your Etsy app; set `ETSY_REDIRECT_PORT` to use another port. By default it requests every scope used by any Operation; narrow it with `--scopes`, e.g. `login --scopes listings_r,shops_r`. If the browser cannot be opened, the authorize URL is printed to stderr. Running `etsy-mcp` with no subcommand starts the MCP server. If `ETSY_REFRESH_TOKEN` is set when you run `login`, the login result is kept over that value on later server starts.
+
 Tokens live in `~/.config/etsy-mcp/tokens.json` (`{access_token, refresh_token, expires_at, seed_sha256?}`, `expires_at` in epoch milliseconds; mode 0600). The server refreshes the access token 60 seconds before it expires and once after a 401, and always saves the new token pair (Etsy may rotate refresh tokens). For headless use set `ETSY_REFRESH_TOKEN`: it seeds the token file when the file is absent or this value has not been used to seed it before. The file records a SHA-256 of the seeded value (`seed_sha256`, never the raw token), so a rotated refresh token is not overwritten by the stale environment value on restart; set a new `ETSY_REFRESH_TOKEN` value to re-seed. If no token is available the Tool returns an error telling you to run `npx @artisanxl/etsy-mcp login`; a 403 adds a hint to re-run `login` with the needed scopes.
 
 `ETSY_ACCESS_TOKEN` is no longer supported; if set, a warning is printed to stderr and it is ignored.
