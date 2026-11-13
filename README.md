@@ -31,11 +31,15 @@ claude mcp add etsy -e ETSY_API_KEY=your-keystring -e ETSY_SHARED_SECRET=your-sh
 
 ## Tools
 
-One Tool per Etsy Open API v3 Operation (104 of 107; the three multipart file uploads are not offered yet), named as the snake_case `operationId` (e.g. `get_listing`, `get_listings_by_shop`) and generated from the committed spec in `spec/`. Input schemas (enums, bounds, required/optional, arrays) come from the spec; path, query and body fields form one flat input set. Array query and form-urlencoded body values are sent comma-joined (e.g. `listing_ids=1,2,3`, `tags=blue,mug`); JSON bodies (e.g. `update_listing_inventory`) are sent as real JSON with nested objects and arrays. Regenerate with `npm run gen:local`.
+One Tool per Etsy Open API v3 Operation (107), named as the snake_case `operationId` (e.g. `get_listing`, `get_listings_by_shop`) and generated from the committed spec in `spec/`. Input schemas (enums, bounds, required/optional, arrays) come from the spec; path, query and body fields form one flat input set. Array query and form-urlencoded body values are sent comma-joined (e.g. `listing_ids=1,2,3`, `tags=blue,mug`); JSON bodies (e.g. `update_listing_inventory`) are sent as real JSON with nested objects and arrays. Regenerate with `npm run gen:local`.
 
 ### Toolsets
 
 Every Tool belongs to exactly one Toolset: `listings`, `shop`, `shipping`, `orders`, `reviews`, `taxonomy`, `users` or `other`. Set `ETSY_TOOLSETS` to a comma-separated list (e.g. `ETSY_TOOLSETS=listings,orders`) to offer only those Toolsets' Tools; unset offers all. An unknown or empty value fails at startup with the list of valid names.
+
+### File uploads
+
+`upload_listing_image` (`image`), `upload_listing_file` (`file`) and `upload_listing_video` (`video`) take a **local file path** in that field. The server reads the file and sends it as multipart with the original filename. The field stays optional where the Etsy spec says so (e.g. `upload_listing_image` with only `listing_image_id` reads no file). A missing or unreadable path returns a Tool error and no request is sent to Etsy. These are Write Tools, so they need `ETSY_ALLOW_WRITES=true`.
 
 ### Read-only Mode and Write Tools
 

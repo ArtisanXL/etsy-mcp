@@ -1,3 +1,5 @@
+import { readFile as fsReadFile } from "node:fs/promises";
+import { basename, extname } from "node:path";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import type { ToolAnnotations } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
@@ -9,13 +11,15 @@ import type { OperationDescriptor, ParamDescriptor, PropertyDescriptor, ValueSch
 export interface FetchInit {
   method?: OperationDescriptor["method"];
   headers: Record<string, string>;
-  body?: string;
+  body?: string | FormData;
 }
 export type FetchLike = (url: URL, init: FetchInit) => Promise<Response>;
 
 export interface ServerDeps {
   fetch?: FetchLike;
   now?: () => number;
+  /** Reads a local file for multipart uploads. */
+  readFile?: (path: string) => Promise<Uint8Array>;
 }
 
 const API_BASE = "https://openapi.etsy.com";
@@ -60,7 +64,19 @@ function propertyShape(props: PropertyDescriptor[]): Record<string, z.ZodType> {
 }
 
 function paramShape(params: ParamDescriptor[]): Record<string, z.ZodType> {
-  return Object.fromEntries(params.map((p) => [p.name, propertySchema(p, p.in === "query")]));
+  return Object.fromEntries(
+    params.map((p) => {
+      const described =
+        p.in === "body-multipart-file"
+          ? {
+              ...p,
+              description:
+                `${p.description ?? ""} Local path of the file to upload; the server reads it from disk.`.trim(),
+            }
+          : p;
+      return [p.name, propertySchema(described, p.in === "query")];
+    }),
+  );
 }
 
 function toolAnnotations(op: OperationDescriptor): ToolAnnotations {
@@ -75,11 +91,48 @@ function toolAnnotations(op: OperationDescriptor): ToolAnnotations {
 
 const formValue = (v: unknown) => (Array.isArray(v) ? v.join(",") : String(v));
 
-function buildRequest(op: OperationDescriptor, args: Record<string, unknown>) {
+const MIME_TYPES: Record<string, string> = {
+  ".jpg": "image/jpeg",
+  ".jpeg": "image/jpeg",
+  ".png": "image/png",
+  ".gif": "image/gif",
+  ".webp": "image/webp",
+  ".mp4": "video/mp4",
+  ".mov": "video/quicktime",
+  ".avi": "video/x-msvideo",
+  ".m4v": "video/x-m4v",
+  ".pdf": "application/pdf",
+  ".zip": "application/zip",
+  ".txt": "text/plain",
+};
+
+class UploadError extends Error {}
+
+async function readUpload(readFile: (path: string) => Promise<Uint8Array>, field: string, path: string) {
+  let bytes: Uint8Array;
+  try {
+    bytes = await readFile(path);
+  } catch (err) {
+    const reason = err instanceof Error ? err.message : String(err);
+    throw new UploadError(`Cannot read file for "${field}" at "${path}": ${reason}`);
+  }
+  const type = MIME_TYPES[extname(path).toLowerCase()] ?? "application/octet-stream";
+  return {
+    blob: new Blob([bytes as Uint8Array<ArrayBuffer>], { type }),
+    filename: basename(path),
+  };
+}
+
+async function buildRequest(
+  op: OperationDescriptor,
+  args: Record<string, unknown>,
+  readFile: (path: string) => Promise<Uint8Array>,
+) {
   let path = op.path;
   const url = new URL(API_BASE);
   const form = new URLSearchParams();
   const json: Record<string, unknown> = {};
+  const multipart = new FormData();
   for (const p of op.params) {
     const v = args[p.name];
     if (v === undefined) continue;
@@ -91,13 +144,26 @@ function buildRequest(op: OperationDescriptor, args: Record<string, unknown>) {
     else if (p.in === "query") url.searchParams.set(p.name, formValue(v));
     else if (p.in === "body-form") form.set(p.name, formValue(v));
     else if (p.in === "body-json") json[p.name] = v;
+    else if (p.in === "body-multipart") multipart.append(p.name, formValue(v));
+    else if (p.in === "body-multipart-file") {
+      const { blob, filename } = await readUpload(readFile, p.name, String(v));
+      multipart.append(p.name, blob, filename);
+    }
   }
   url.pathname = path;
   if (op.params.some((p) => p.in === "body-form")) {
-    return { url, contentType: "application/x-www-form-urlencoded", body: form.toString() };
+    return {
+      url,
+      contentType: "application/x-www-form-urlencoded",
+      body: form.toString(),
+    };
   }
   if (op.params.some((p) => p.in === "body-json")) {
     return { url, contentType: "application/json", body: JSON.stringify(json) };
+  }
+  // No Content-Type for multipart: fetch sets it with the boundary.
+  if (op.params.some((p) => p.in === "body-multipart" || p.in === "body-multipart-file")) {
+    return { url, body: multipart };
   }
   return { url };
 }
@@ -108,6 +174,7 @@ function errorResult(text: string) {
 
 export function createServer(config: Config, deps: ServerDeps = {}): McpServer {
   const fetchImpl = deps.fetch ?? fetch;
+  const readFile = deps.readFile ?? fsReadFile;
   const tokens = new TokenStore({
     configDir: config.configDir,
     apiKey: config.apiKey,
@@ -118,23 +185,35 @@ export function createServer(config: Config, deps: ServerDeps = {}): McpServer {
   const server = new McpServer({ name: "etsy-mcp", version: "0.1.1" });
 
   const enabled = config.toolsets && new Set<string>(config.toolsets);
-  const offered = operations.filter(
-    (op) =>
-      (config.allowWrites || !op.write) &&
-      (!enabled || enabled.has(op.toolset)) &&
-      !op.params.some((p) => p.in === "body-multipart" || p.in === "body-multipart-file"),
-  );
+  const offered = operations.filter((op) => (config.allowWrites || !op.write) && (!enabled || enabled.has(op.toolset)));
   for (const op of offered) {
     server.registerTool(
       op.toolName,
-      { description: op.description, inputSchema: paramShape(op.params), annotations: toolAnnotations(op) },
+      {
+        description: op.description,
+        inputSchema: paramShape(op.params),
+        annotations: toolAnnotations(op),
+      },
       async (args: Record<string, unknown>) => {
-        const { url, contentType, body: requestBody } = buildRequest(op, args);
+        let built: Awaited<ReturnType<typeof buildRequest>>;
+        try {
+          built = await buildRequest(op, args, readFile);
+        } catch (err) {
+          if (err instanceof UploadError) return errorResult(err.message);
+          throw err;
+        }
+        const { url, contentType, body: requestBody } = built;
         const send = (bearer?: string) => {
-          const headers: Record<string, string> = { "x-api-key": `${config.apiKey}:${config.sharedSecret}` };
+          const headers: Record<string, string> = {
+            "x-api-key": `${config.apiKey}:${config.sharedSecret}`,
+          };
           if (bearer) headers.Authorization = `Bearer ${bearer}`;
           if (contentType) headers["Content-Type"] = contentType;
-          return fetchImpl(url, { method: op.method, headers, body: requestBody });
+          return fetchImpl(url, {
+            method: op.method,
+            headers,
+            body: requestBody,
+          });
         };
         const needsOAuth = op.oauth2;
         let res: Response;
