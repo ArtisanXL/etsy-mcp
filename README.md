@@ -16,6 +16,7 @@ MCP server for the [Etsy Open API v3](https://developers.etsy.com/documentation/
       "args": ["-y", "@artisanxl/etsy-mcp"],
       "env": {
         "ETSY_API_KEY": "your-keystring",
+        "ETSY_SHARED_SECRET": "your-shared-secret",
         "ETSY_ACCESS_TOKEN": "optional-oauth-token"
       }
     }
@@ -26,7 +27,7 @@ MCP server for the [Etsy Open API v3](https://developers.etsy.com/documentation/
 Claude Code:
 
 ```sh
-claude mcp add etsy -e ETSY_API_KEY=your-keystring -- npx -y @artisanxl/etsy-mcp
+claude mcp add etsy -e ETSY_API_KEY=your-keystring -e ETSY_SHARED_SECRET=your-shared-secret -- npx -y @artisanxl/etsy-mcp
 ```
 
 ## Tools
