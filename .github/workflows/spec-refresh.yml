@@ -1,0 +1,67 @@
+name: Spec refresh
+
+on:
+  schedule:
+    - cron: "17 6 * * 1" # Mondays 06:17 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: spec-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    # never run on forks
+    if: github.repository == 'ArtisanXL/etsy-mcp'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      BRANCH: chore/spec-refresh
+      # PRs opened with GITHUB_TOKEN do not trigger CI; set SPEC_REFRESH_TOKEN (a PAT) to get CI on the PR
+      GH_TOKEN: ${{ secrets.SPEC_REFRESH_TOKEN || secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      # Fails the job (and so opens no PR) on a bad download, an unmapped tag, a missing operationId or a duplicate Tool name.
+      - run: npm run gen
+      - name: Detect changes
+        id: diff
+        run: |
+          if [ -z "$(git status --porcelain)" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "Spec Snapshot unchanged; no PR needed."
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            git status --short
+          fi
+      - name: Typecheck and test the regenerated output
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          npm run typecheck
+          npm test
+      - name: Open or update PR
+        if: steps.diff.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git add -A
+          git commit -m "Refresh Etsy Spec Snapshot"
+          git push --force "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" "HEAD:refs/heads/${BRANCH}"
+          if [ -n "$(gh pr list --head "$BRANCH" --state open --json number --jq '.[].number')" ]; then
+            echo "A refresh PR is already open; branch updated."
+          else
+            gh pr create --base main --head "$BRANCH" \
+              --title "Refresh Etsy Spec Snapshot" \
+              --body "Automated weekly refresh: \`npm run gen\` downloaded the latest Etsy Open API v3 spec into \`spec/\` and regenerated \`src/generated/\`. Review the diff for new, changed or removed Operations. Never hand-resolve conflicts in the generated output: rebase and re-run \`npm run gen:local\`."
+          fi

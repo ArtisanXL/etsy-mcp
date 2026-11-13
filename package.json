@@ -19,7 +19,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "prepublishOnly": "npm run build",
-    "gen:local": "tsx scripts/gen.ts"
+    "gen:local": "tsx scripts/gen.ts",
+    "gen": "tsx scripts/update-spec.ts && npm run gen:local"
   },
   "keywords": [
     "mcp",
