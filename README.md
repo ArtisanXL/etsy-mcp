@@ -1,5 +1,9 @@
 # @artisanxl/etsy-mcp
 
+[![npm](https://img.shields.io/npm/v/@artisanxl/etsy-mcp)](https://www.npmjs.com/package/@artisanxl/etsy-mcp)
+[![CI](https://github.com/ArtisanXL/etsy-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/ArtisanXL/etsy-mcp/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 MCP server for the [Etsy Open API v3](https://developers.etsy.com/documentation/).
 
 ## Usage
@@ -38,8 +42,11 @@ claude mcp add etsy -e ETSY_API_KEY=your-keystring -- npx -y @artisanxl/etsy-mcp
 ```sh
 npm install
 npm run build
-npm publish   # publishes as public scoped package
 ```
+
+Releases are published to npm automatically (with provenance) when a GitHub Release is published.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) and [SECURITY.md](SECURITY.md).
 
 ## License
 
