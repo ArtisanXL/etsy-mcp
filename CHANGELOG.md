@@ -6,6 +6,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+- Requests now send `x-api-key` as `keystring:shared_secret`; the new `ETSY_SHARED_SECRET` env var is required alongside `ETSY_API_KEY`, and the server fails at startup if either is missing.
+- Server is built by a testable `createServer` factory; added Vitest tests.
+
 ## [0.1.1] - 2026-11-13
 
 ### Changed
