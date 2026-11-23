@@ -675,7 +675,7 @@ export const operations: OperationDescriptor[] = [
         "in": "body-json",
         "required": false,
         "type": "string",
-        "description": "A flag indicating if the shipment is tied to a revenue share agreement between Etsy and the vendor.",
+        "description": "A flag indicating if the shipment is tied to a revenue share agreement between Etsy and the vendor. Accepted values are \"1\" for true and \"0\" for false.",
         "nullable": true
       },
       {
